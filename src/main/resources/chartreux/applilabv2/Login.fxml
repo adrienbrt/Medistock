@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chartreux.applilabv2.controllers.controllerLogin">
+   <left>
+      <AnchorPane prefHeight="400.0" prefWidth="268.0" style="-fx-background-color: #008640;" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="68.0" layoutY="174.0" text="MANAGELAB" textFill="WHITE">
+               <font>
+                  <Font size="21.0" />
+               </font>
+            </Label>
+         </children></AnchorPane>
+   </left>
+   <right>
+      <AnchorPane prefHeight="400.0" prefWidth="332.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="97.0" layoutY="56.0" text="Connexion">
+               <font>
+                  <Font size="26.0" />
+               </font>
+            </Label>
+            <Label layoutX="35.0" layoutY="157.0" text="Utilisateur">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label layoutX="14.0" layoutY="218.0" text="Mot de passe">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Button fx:id="connexionButton" layoutX="76.0" layoutY="282.0" mnemonicParsing="false" onAction="#onClickLogin" prefHeight="50.0" prefWidth="182.0" text="Login" />
+            <TextField fx:id="usernameLabel" layoutX="130.0" layoutY="154.0" promptText="Login" />
+            <PasswordField fx:id="passwordLabel" layoutX="130.0" layoutY="215.0" promptText="Mot de passe" />
+            <Label fx:id="loginMessageLabel" layoutX="44.0" layoutY="104.0" prefHeight="18.0" prefWidth="246.0" textFill="RED" />
+         </children></AnchorPane>
+   </right>
+</BorderPane>
