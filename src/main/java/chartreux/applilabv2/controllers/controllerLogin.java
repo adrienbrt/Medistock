@@ -1,5 +1,6 @@
 package chartreux.applilabv2.controllers;
 
+import chartreux.applilabv2.Entity.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,6 +24,11 @@ public class controllerLogin {
 
     @FXML
     void onClickLogin(ActionEvent event) {
-        loginMessageLabel.setText("Mauvais identifiants");
+
+        if(!usernameLabel.getText().isBlank() && !passwordLabel.getText().isBlank()){
+            loginMessageLabel.setText("tentative de connexion");
+        }else {
+            loginMessageLabel.setText("veuillez remplir les champs");
+        }
     }
 }
