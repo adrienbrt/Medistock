@@ -35,4 +35,26 @@ public class DAOUser {
         }
         return user;
     }
+
+    public User findConnect(String login, String password) throws SQLException {
+        User user = null;
+        String SQL = "SELECT * FROM utilisateurs WHERE login=? AND password=?";
+        try (PreparedStatement ps = cnx.prepareStatement(SQL)) {
+            ps.setString(1, login);
+            ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new User(
+                            rs.getString("id"),
+                            rs.getString("login"),
+                            rs.getString("password"),
+                            rs.getString("nom"),
+                            rs.getString("prenom"),
+                            rs.getString("role_id")
+                    );
+                }
+            }
+        }
+        return user;
+    }
 }
