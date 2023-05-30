@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class controllerLogin {
     private Connection cnx;
@@ -44,7 +45,18 @@ public class controllerLogin {
             User user = new DAOUser(cnx).findConnect(usernameLabel.getText(),passwordLabel.getText());
             if (user == null){
                 loginMessageLabel.setText("mauvais identifiants");
-            }else {
+            }else if (Objects.equals(user.getRoleId(), "role1")){
+                FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("manageUser.fxml"));
+                controllerManageUser controllerManageUser = new controllerManageUser(cnx,user);
+                fxmlLoader.setController(controllerManageUser);
+
+                Parent root = fxmlLoader.load();
+                Scene scene = new Scene(root);
+                Stage stage = (Stage) connexionButton.getScene().getWindow();
+                stage.setScene(scene);
+                stage.centerOnScreen();
+            }
+            else {
                 FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Tableau.fxml"));
                 controllerTableau controllerTableau = new controllerTableau(cnx,user);
                 fxmlLoader.setController(controllerTableau);

@@ -1,5 +1,7 @@
 package chartreux.applilabv2.Entity;
 
+import java.util.List;
+
 public class User {
     private String id;
     private String login;
@@ -8,6 +10,26 @@ public class User {
     private String prenom;
 
     private String roleId;
+
+    private List<Laboratoire> laboratoires;
+
+    public User(String id, String login, String password, String nom, String prenom, String roleId, List<Laboratoire> laboratoires) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.roleId = roleId;
+        this.laboratoires = laboratoires;
+    }
+    public User(String id, String login, String password, String nom, String prenom, String roleId, String laboratoires) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.roleId = roleId;
+    }
 
     public User(String id, String login, String password, String nom, String prenom, String roleId) {
         this.id = id;
