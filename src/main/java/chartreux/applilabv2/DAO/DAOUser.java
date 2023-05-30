@@ -30,7 +30,7 @@ public class DAOUser {
                             rs.getString("password"),
                             rs.getString("nom"),
                             rs.getString("prenom"),
-                            rs.getString("role_id")
+                            rs.getBoolean("role_id")
                     );
                 }
             }
@@ -52,7 +52,7 @@ public class DAOUser {
                             rs.getString("password"),
                             rs.getString("nom"),
                             rs.getString("prenom"),
-                            rs.getString("role_id")
+                            rs.getBoolean("role_id")
                     );
                 }
             }
@@ -71,7 +71,7 @@ public class DAOUser {
                     rs.getString("password"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
-                    rs.getString("role_id"));
+                    rs.getBoolean("role_id"));
             users.add(user);
         }
         return users;
@@ -92,7 +92,7 @@ public class DAOUser {
                     rs.getString("password"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
-                    rs.getString("role_id"),
+                    rs.getBoolean("role_id"),
                     rs.getString("nomLab"));
             users.add(user);
         }

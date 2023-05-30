@@ -3,7 +3,6 @@ package chartreux.applilabv2.controllers;
 import chartreux.applilabv2.DAO.DAOUser;
 import chartreux.applilabv2.Entity.User;
 import chartreux.applilabv2.HelloApplication;
-import chartreux.applilabv2.Util.Singleton;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -45,8 +43,8 @@ public class controllerLogin {
             User user = new DAOUser(cnx).findConnect(usernameLabel.getText(),passwordLabel.getText());
             if (user == null){
                 loginMessageLabel.setText("mauvais identifiants");
-            }else if (Objects.equals(user.getRoleId(), "role1")){
-                FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("manageUser.fxml"));
+            }else if (user.getIsAdmin()){
+                FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ManageUser.fxml"));
                 controllerManageUser controllerManageUser = new controllerManageUser(cnx,user);
                 fxmlLoader.setController(controllerManageUser);
 

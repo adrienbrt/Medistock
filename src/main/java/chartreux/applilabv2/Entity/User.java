@@ -1,6 +1,6 @@
 package chartreux.applilabv2.Entity;
 
-import java.util.List;
+import java.util.HashMap;
 
 public class User {
     private String id;
@@ -9,35 +9,35 @@ public class User {
     private String nom;
     private String prenom;
 
-    private String roleId;
+    private boolean isAdmin;
 
-    private List<Laboratoire> laboratoires;
+    private HashMap<Laboratoire,Role> laboratoires;
 
-    public User(String id, String login, String password, String nom, String prenom, String roleId, List<Laboratoire> laboratoires) {
+    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, HashMap<Laboratoire,Role> laboratoires) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.nom = nom;
         this.prenom = prenom;
-        this.roleId = roleId;
+        this.isAdmin = isAdmin;
         this.laboratoires = laboratoires;
     }
-    public User(String id, String login, String password, String nom, String prenom, String roleId, String laboratoires) {
+    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, String laboratoires) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.nom = nom;
         this.prenom = prenom;
-        this.roleId = roleId;
+        this.isAdmin = isAdmin;
     }
 
-    public User(String id, String login, String password, String nom, String prenom, String roleId) {
+    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.nom = nom;
         this.prenom = prenom;
-        this.roleId = roleId;
+        this.isAdmin = isAdmin;
     }
 
     public User() {
@@ -84,12 +84,20 @@ public class User {
         this.prenom = prenom;
     }
 
-    public String getRoleId() {
-        return roleId;
+    public boolean getIsAdmin() {
+        return isAdmin;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public HashMap<Laboratoire, Role> getLaboratoires() {
+        return laboratoires;
+    }
+
+    public void setLaboratoires(HashMap<Laboratoire, Role> laboratoires) {
+        this.laboratoires = laboratoires;
     }
 
     @Override
@@ -100,7 +108,7 @@ public class User {
                 ", password='" + password + '\'' +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
-                ", role=" + roleId +
+                ", role=" + isAdmin +
                 '}';
     }
 }

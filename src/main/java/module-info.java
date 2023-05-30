@@ -8,5 +8,6 @@ module chartreux.applilabv2 {
 
     opens chartreux.applilabv2 to javafx.fxml;
     opens chartreux.applilabv2.controllers to javafx.fxml;
+    opens chartreux.applilabv2.Entity to javafx.base;
     exports chartreux.applilabv2;
 }

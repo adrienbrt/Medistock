@@ -15,6 +15,7 @@ public class Laboratoire {
         this.CP = CP;
     }
 
+
     public Laboratoire() {
     }
 

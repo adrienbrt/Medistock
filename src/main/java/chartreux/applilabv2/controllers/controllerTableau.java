@@ -49,7 +49,7 @@ public class controllerTableau implements Initializable {
 
     private void doAddUser(){
         try{
-            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("manageUser.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ManageUser.fxml"));
             controllerManageUser controllerManageUser = new controllerManageUser(cnx,user);
             fxmlLoader.setController(controllerManageUser);
 
