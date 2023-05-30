@@ -11,6 +11,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javafx.application.Application;
@@ -25,6 +26,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 
 public class controllerManageUser implements Initializable {
+
+    @FXML
+    private Button ButtonAdd;
     @FXML
     private TextField fieldLogin;
 
@@ -68,6 +72,11 @@ public class controllerManageUser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            new DAOUser(cnx).Create();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         /* ajoute utilisteur dans tableau */
         try {
@@ -144,20 +153,45 @@ public class controllerManageUser implements Initializable {
                 setComboLabo();
             }
         });
+
+        ButtonAdd.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                clickAdd();
+            }
+        });
+    }
+
+    private void clickAdd() {
+        if (
+                fieldLogin.getText().isEmpty() ||
+                fieldPassword.getText().isEmpty() ||
+                fieldNom.getText().isEmpty() || fieldPrenom.getText().isEmpty() || comboRole.getValue() == null
+        ){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Erreur");
+            alert.setHeaderText("Problème d'ajout");
+            alert.setContentText("Un champs est manquant");
+
+            alert.showAndWait();
+        }
     }
 
     private void setComboRole() {
         Role selectedRole = comboRole.getValue();
-        if (selectedRole != null) {
-            String libelle = selectedRole.getLibelle();
-            // Utilisez le libellé sélectionné comme nécessaire
-            System.out.println("Rôle sélectionné : " + libelle);
+        assert selectedRole != null;
+        if (selectedRole.getId().equals("role1")){
+            comboLabo.setDisable(true);
+            comboLabo.setValue(null);
+        }else {
+            comboLabo.setDisable(false);
         }
     }
 
     private void setComboLabo() {
         Laboratoire selectedLabo = comboLabo.getValue();
         if (selectedLabo != null) {
+
             String nom = selectedLabo.getNom();
             // Utilisez le libellé sélectionné comme nécessaire
             System.out.println("Labo sélectionné : " + nom);
