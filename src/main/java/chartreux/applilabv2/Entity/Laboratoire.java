@@ -15,6 +15,11 @@ public class Laboratoire {
         this.CP = CP;
     }
 
+    public Laboratoire(String id, String nom) {
+        this.id = id;
+        this.nom = nom;
+    }
+
 
     public Laboratoire() {
     }

@@ -10,11 +10,9 @@ import chartreux.applilabv2.Entity.User;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
-import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,71 +21,73 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.util.StringConverter;
 
 public class controllerManageUser implements Initializable {
-
+    @FXML
+    private Label labelErrorRole;
     @FXML
     private Button ButtonAdd;
     @FXML
     private TextField fieldLogin;
-
     @FXML
     private TextField fieldNom;
-
     @FXML
     private PasswordField fieldPassword;
-
     @FXML
     private TextField fieldPrenom;
-
     @FXML
     private ComboBox<Role> comboRole;
-
     @FXML
     private ComboBox<Laboratoire> comboLabo;
-
     @FXML
     private TableColumn<User, String> loginColumn;
-
     @FXML
     private TableColumn<User, String> nomColumn;
-
     @FXML
     private TableColumn<User, String> prenomColumn;
-
     @FXML
     private TextField searchBar;
-
     @FXML
     private TableView<User> tableView;
-    private Connection cnx;
+    @FXML
+    private Button suppLabRole;
+    @FXML
+    private TableView<HashMap<Laboratoire, Role>> tableLabRole;
+    @FXML
+    private Button addLabRole;
+    @FXML
+    private TableColumn<HashMap<Laboratoire, Role>, String> laboColumn;
+    @FXML
+    private TableColumn<HashMap<Laboratoire, Role>, String> roleColumn;
+
+    private final Connection cnx;
     private User user;
+
+    private List<User> users;
+
+    private HashMap<Laboratoire,Role> labRole;
+
+    private  List<HashMap<Laboratoire,Role>> listLabRole;
 
     public controllerManageUser(Connection cnx, User user) {
         this.cnx = cnx;
         this.user = user;
-    }
 
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            new DAOUser(cnx).Create();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
+        labRole = new HashMap<>();
+        listLabRole = new ArrayList<>();
+
+
 
         /* ajoute utilisteur dans tableau */
         try {
-            ObservableList<User> users = FXCollections.observableList(new DAOUser(cnx).findAll(0,50));
-
-            loginColumn.setCellValueFactory(new PropertyValueFactory<User,String>("login"));
-            nomColumn.setCellValueFactory(new PropertyValueFactory<User,String>("nom"));
-            prenomColumn.setCellValueFactory(new PropertyValueFactory<User,String >("prenom"));
-
-            tableView.setItems(users);
-
+            setupTableUser();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -109,8 +109,6 @@ public class controllerManageUser implements Initializable {
                 }
 
             });
-
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -154,15 +152,119 @@ public class controllerManageUser implements Initializable {
             }
         });
 
+        /*Ajoute utilisateur*/
         ButtonAdd.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                clickAdd();
+                try {
+                    clickAdd();
+
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        /*Selection un utilisateur*/
+        tableView.setOnMouseClicked(mouseEvent -> {
+            listLabRole.clear();
+            User selected = tableView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
+                    tableView.getSelectionModel().clearSelection();
+                    fieldLogin.setText("");
+                    fieldNom.setText("");
+                    fieldPrenom.setText("");
+                    fieldPassword.setText("");
+                    tableLabRole.getItems().clear();
+                }else{
+                    fieldLogin.setText(selected.getLogin());
+                    fieldPrenom.setText(selected.getPrenom());
+                    fieldNom.setText(selected.getNom());
+
+                    if(selected.getLaboratoires().isEmpty()){
+                        tableLabRole.getItems().clear();
+                    }else {
+
+                        selected.getLaboratoires().forEach((key, value)->{
+                            HashMap<Laboratoire, Role> map = new HashMap<>();
+                            map.put(key,value);
+                            listLabRole.add(map);
+                        });
+
+                        // Convertissez la liste en une ObservableList
+                        ObservableList<HashMap<Laboratoire, Role>> selectedObservableList = FXCollections.observableArrayList(listLabRole);
+
+                        // Affectez la liste à la table
+                        tableLabRole.setItems(selectedObservableList);
+
+                        laboColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().keySet().iterator().next().getNom()));
+                        roleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values().iterator().next().getLibelle()));
+                    }
+                }
+            }
+        });
+
+        /*ajoute un role à un laboratoire*/
+        addLabRole.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                addRole();
+            }
+        });
+
+        /*supprime un role*/
+        suppLabRole.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                suppRole();
             }
         });
     }
 
-    private void clickAdd() {
+
+    private void addRole(){
+        if(comboRole.getValue() == null || (comboLabo.getValue() == null && !Objects.equals(comboRole.getValue().getId(), "role1"))){
+            labelErrorRole.setText("vueuillez remplir les champs");
+        }else{
+            listLabRole.clear();
+            labelErrorRole.setText("");
+            System.out.println(labRole.containsKey(comboLabo.getValue()));
+
+            if (labRole.containsKey(comboLabo.getValue())){
+                Role old = labRole.get(comboLabo.getValue());
+                labRole.replace(comboLabo.getValue(),old,comboRole.getValue());
+            }else{
+                labRole.put(comboLabo.getValue(),comboRole.getValue());
+            }
+            labRole.forEach((key, value)->{
+                HashMap<Laboratoire, Role> map = new HashMap<>();
+                map.put(key,value);
+                listLabRole.add(map);
+            });
+
+
+            System.out.println(labRole.size());
+            System.out.println(listLabRole.size());
+
+            // Convertissez la liste en une ObservableList
+            ObservableList<HashMap<Laboratoire, Role>> ObservableList = FXCollections.observableArrayList(listLabRole);
+
+            // Affectez la liste à la table
+            tableLabRole.setItems(ObservableList);
+
+            laboColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().keySet().iterator().next().getNom()));
+            roleColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().values().iterator().next().getLibelle()));
+
+        }
+    }
+
+    private void suppRole(){
+
+    }
+
+    private void clickAdd() throws SQLException {
+        User user1 = new User();
         if (
                 fieldLogin.getText().isEmpty() ||
                 fieldPassword.getText().isEmpty() ||
@@ -174,7 +276,59 @@ public class controllerManageUser implements Initializable {
             alert.setContentText("Un champs est manquant");
 
             alert.showAndWait();
+        }else if (comboRole.getValue().getId().equals("role1")){
+            user1.setLogin(fieldLogin.getText());
+            user1.setPassword(fieldPassword.getText());
+            user1.setNom(fieldNom.getText());
+            user1.setPrenom(fieldPrenom.getText());
+            user1.setIsAdmin(true);
+            new DAOUser(cnx).CreateSup(user1);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Ajout");
+            alert.setContentText("Ajout de l'utilisateur " +user1.getLogin());
+
+            alert.showAndWait();
+        }else if(!comboRole.getValue().getId().equals("role1")
+                && comboRole.getValue() != null
+                && comboLabo.getValue()!= null){
+
+            HashMap<Laboratoire,Role> labRole = new HashMap<>();
+
+            user1.setLogin(fieldLogin.getText());
+            user1.setPassword(fieldPassword.getText());
+            user1.setNom(fieldNom.getText());
+            user1.setPrenom(fieldPrenom.getText());
+            user1.setIsAdmin(false);
+
+            labRole.put(comboLabo.getValue(),comboRole.getValue());
+
+            new DAOUser(cnx).CreateNorm(user1,labRole);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Ajout");
+            alert.setContentText("Ajout de l'utilisateur " +user1.getLogin());
+
+            alert.showAndWait();
         }
+
+        ObservableList<User> users = FXCollections.observableList(new DAOUser(cnx).findAll(0,50));
+
+        loginColumn.setCellValueFactory(new PropertyValueFactory<User,String>("login"));
+        nomColumn.setCellValueFactory(new PropertyValueFactory<User,String>("nom"));
+        prenomColumn.setCellValueFactory(new PropertyValueFactory<User,String >("prenom"));
+
+        tableView.setItems(users);
+    }
+
+    private void setupTableUser() throws SQLException {
+        ObservableList<User> users = FXCollections.observableList(new DAOUser(cnx).findAllLab(0,50,""));
+
+        loginColumn.setCellValueFactory(new PropertyValueFactory<User,String>("login"));
+        nomColumn.setCellValueFactory(new PropertyValueFactory<User,String>("nom"));
+        prenomColumn.setCellValueFactory(new PropertyValueFactory<User,String >("prenom"));
+
+        tableView.getItems().addAll(users);
     }
 
     private void setComboRole() {

@@ -2,6 +2,7 @@ package chartreux.applilabv2.DAO;
 import chartreux.applilabv2.Entity.Laboratoire;
 import chartreux.applilabv2.Entity.Role;
 import chartreux.applilabv2.Entity.User;
+import chartreux.applilabv2.Entity.UserInLab;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -80,27 +81,80 @@ public class DAOUser {
     }
 
 
-    public List<User> findByLab(int offset, int limit,String lab) throws SQLException{
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT u.id, u.login, u.password, u.nom, u.prenom, u.role_id, l.nom as nomLab FROM utilisateurs u, userInLab uil, laboratoires l  WHERE u.id = uil.userId AND uil.labId = l.id AND l.id =? LIMIT ? OFFSET ?;";
-        PreparedStatement ps = cnx.prepareStatement(sql);
-        ps.setString(1, lab+"%");
-        ps.setInt(2, limit);
-        ps.setInt(3, offset);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()){
+    public List<User> findAllLab(int offset, int limit,String lab) throws SQLException{
+        List<Laboratoire> laboratoireList = new DAOLaboratoire(cnx).findAll();
+        List<Role> roles = new DAORole(cnx).findAll();
 
-            User user = new User( rs.getString("id"),
-                    rs.getString("login"),
-                    rs.getString("password"),
-                    rs.getString("nom"),
-                    rs.getString("prenom"),
-                    rs.getBoolean("role_id"),
-                    rs.getString("nomLab"));
-            users.add(user);
+        List<User> utilisateurs = findAll(offset,limit);
+
+        List<User> lesUtilisateurs = new ArrayList<>();
+
+        HashMap<String, Laboratoire> laboratoireMap = new HashMap<>();
+        HashMap<String, Role> roleMap = new HashMap<>();
+
+        for (Laboratoire laboratoire : laboratoireList) {
+            laboratoireMap.put(laboratoire.getId(), laboratoire);
         }
-        return users;
+
+        for (Role role : roles) {
+            roleMap.put(role.getId(), role);
+        }
+
+        for (User utilisateur:utilisateurs) {
+            String userId = utilisateur.getId();
+            HashMap<Laboratoire, Role> laboratoires = new HashMap<>();
+
+            List<UserInLab> userInLabRecords = new DAOUserInLab(cnx).getUserInLabRecordsByUserId(userId);
+
+            for (UserInLab userInLab: userInLabRecords){
+                String labID = userInLab.getLabId();
+                Laboratoire laboratoire = laboratoireMap.get(labID);
+
+                String roleId = userInLab.getRoleId();
+                Role role = roleMap.get(roleId);
+
+                laboratoires.put(laboratoire,role);
+
+            }
+
+            utilisateur.setLaboratoires(laboratoires);
+
+            lesUtilisateurs.add(utilisateur);
+        }
+
+        return lesUtilisateurs;
     }
+
+    /*public List<UserInLab> getUserInLabRecordsByUserId(String userId) {
+        List<UserInLab> userInLabRecords = new ArrayList<>();
+
+        // Utilisez une requête SQL pour récupérer les enregistrements correspondants dans la table userInLab
+        String query = "SELECT * FROM userInLab WHERE userId = ?";
+
+        try (Connection connection = DriverManager.getConnection("your_database_url", "username", "password");
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, userId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    // Récupérez les valeurs des colonnes de la table userInLab
+                    String labId = resultSet.getString("labId");
+                    String roleId = resultSet.getString("roleId");
+
+                    // Créez un nouvel objet UserInLab avec les valeurs récupérées
+                    UserInLab userInLab = new UserInLab(userId, labId, roleId);
+
+                    // Ajoutez l'objet UserInLab à la liste des enregistrements
+                    userInLabRecords.add(userInLab);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userInLabRecords;
+    }*/
+
 
     public void CreateSup(User user) throws SQLException{
         String idUser = (count()+1) +"user";
@@ -111,12 +165,12 @@ public class DAOUser {
         ps.setString(3,user.getPassword());
         ps.setString(4,user.getNom());
         ps.setString(5, user.getPrenom());
-        ResultSet rs = ps.executeQuery();
+        ps.executeUpdate();
         System.out.println("ajouter");
     }
 
     public void CreateNorm(User user, HashMap<Laboratoire,Role> laboRole) throws SQLException{
-        String idUser = (count()+1) +"user";
+        String idUser = "user" + (count()+1);
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 0);";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1, idUser);
@@ -124,7 +178,7 @@ public class DAOUser {
         ps.setString(3,user.getPassword());
         ps.setString(4,user.getNom());
         ps.setString(5, user.getPrenom());
-        ResultSet rs = ps.executeQuery();
+        ps.executeUpdate();
 
         sql = "INSERT INTO userInLab (userId, labId, roleId) VALUES(?, ?, ?);";
         ps = cnx.prepareStatement(sql);
@@ -134,7 +188,7 @@ public class DAOUser {
             ps.setString(1, idUser);
             ps.setString(2, laboratoire.getId());
             ps.setString(3, role.getId());
-            rs = ps.executeQuery();
+            ps.executeUpdate();
         }
 
         System.out.println("ajouter");
