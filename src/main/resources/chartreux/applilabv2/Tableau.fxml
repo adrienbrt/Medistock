@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <AnchorPane prefHeight="80.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="welcomeLabel" layoutX="51.0" layoutY="32.0" prefHeight="16.0" prefWidth="161.0" text="test" />
             <Button fx:id="buttonAddUser" layoutX="473.0" layoutY="18.0" lineSpacing="1.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="127.0" text="Ajout Utilisateur" />
-            <ComboBox fx:id="labCombox" layoutX="186.0" layoutY="28.0" prefWidth="150.0" />
+            <ComboBox fx:id="labCombox" layoutX="225.0" layoutY="28.0" prefHeight="24.0" prefWidth="189.0" promptText="Laboratoire" />
          </children>
       </AnchorPane>
    </top>

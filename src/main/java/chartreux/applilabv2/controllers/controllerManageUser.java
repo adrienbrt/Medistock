@@ -63,7 +63,7 @@ public class controllerManageUser implements Initializable {
     private TableColumn<HashMap<Laboratoire, Role>, String> roleColumn;
 
     private final Connection cnx;
-    private User user;
+    private final User user;
 
     private List<User> users;
 
@@ -116,8 +116,11 @@ public class controllerManageUser implements Initializable {
         /*set values combobox role*/
         try {
             ObservableList<Role> listRole = FXCollections.observableList(new DAORole(cnx).findAll());
-            comboRole.setItems(listRole);
 
+            if(!user.getIsAdmin()){
+               listRole.remove(0);
+            }
+            comboRole.setItems(listRole);
             comboRole.setConverter(new StringConverter<Role>() {
                 @Override
                 public String toString(Role role) {
@@ -167,8 +170,9 @@ public class controllerManageUser implements Initializable {
 
         /*Selection un utilisateur*/
         tableView.setOnMouseClicked(mouseEvent -> {
-            listLabRole.clear();
             User selected = tableView.getSelectionModel().getSelectedItem();
+            listLabRole.clear();
+
             if (selected != null) {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
                     tableView.getSelectionModel().clearSelection();
@@ -177,6 +181,8 @@ public class controllerManageUser implements Initializable {
                     fieldPrenom.setText("");
                     fieldPassword.setText("");
                     tableLabRole.getItems().clear();
+                    listLabRole.clear();
+                    labRole.clear();
                 }else{
                     fieldLogin.setText(selected.getLogin());
                     fieldPrenom.setText(selected.getPrenom());
@@ -185,8 +191,9 @@ public class controllerManageUser implements Initializable {
                     if(selected.getLaboratoires().isEmpty()){
                         tableLabRole.getItems().clear();
                     }else {
+                        labRole = selected.getLaboratoires();
 
-                        selected.getLaboratoires().forEach((key, value)->{
+                        labRole.forEach((key, value)->{
                             HashMap<Laboratoire, Role> map = new HashMap<>();
                             map.put(key,value);
                             listLabRole.add(map);
@@ -260,6 +267,8 @@ public class controllerManageUser implements Initializable {
     }
 
     private void suppRole(){
+
+
 
     }
 

@@ -1,7 +1,6 @@
 package chartreux.applilabv2.DAO;
 
 import chartreux.applilabv2.Entity.Laboratoire;
-import chartreux.applilabv2.Entity.Role;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,22 +15,24 @@ public class DAOLaboratoire {
         this.cnx=cnx;
     }
 
-    public List<Laboratoire> findId(String id) throws SQLException {
-        List<Laboratoire> laboratoires = new ArrayList<>();
+    public Laboratoire findId(String id) throws SQLException {
+        Laboratoire laboratoire = null;
         String sql = "SELECT * FROM laboratoires WHERE id=?";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1, id);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()){
-            Laboratoire laboratoire = new Laboratoire(
-                    rs.getString("id"),
-                    rs.getString("nom"),
-                    rs.getString("adresse"),
-                    rs.getString("ville"),
-                    rs.getString("CP"));
-            laboratoires.add(laboratoire);
+        try (ResultSet rs = ps.executeQuery()){
+            if(rs.next()){
+                laboratoire = new Laboratoire(
+                        rs.getString("id"),
+                        rs.getString("nom"),
+                        rs.getString("adresse"),
+                        rs.getString("ville"),
+                        rs.getString("CP")
+                );
+            }
         }
-        return laboratoires;
+
+        return laboratoire;
     }
     public List<Laboratoire> findAll() throws SQLException {
         List<Laboratoire> laboratoires = new ArrayList<>();
