@@ -51,6 +51,7 @@ public class controllerLogin {
                 Parent root = fxmlLoader.load();
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) connexionButton.getScene().getWindow();
+                stage.setTitle("Accueil");
                 stage.setScene(scene);
                 stage.centerOnScreen();
             }
@@ -64,7 +65,6 @@ public class controllerLogin {
                 Stage stage = (Stage) connexionButton.getScene().getWindow();
                 stage.setScene(scene);
                 stage.centerOnScreen();
-
             }
         }else {
             loginMessageLabel.setText("veuillez remplir les champs");

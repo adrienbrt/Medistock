@@ -32,7 +32,12 @@ import javafx.util.StringConverter;
 public class controllerTableau implements Initializable {
     @FXML
     private Label welcomeLabel;
-
+    @FXML
+    private Button buttonCommande;
+    @FXML
+    private Button buttonIngredient;
+    @FXML
+    private Button buttonMedoc;
     @FXML
     private ComboBox<Laboratoire> labCombox;
     @FXML
@@ -91,6 +96,35 @@ public class controllerTableau implements Initializable {
                 doAddUser();
             }
         });
+        
+        buttonIngredient.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    openIngredientTable();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Ouverture de la page des ingrédients
+     * @throws IOException
+     */
+    private void openIngredientTable() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauIngredient.fxml"));
+        controllerTableauIngredient controllerTableauIngredient = new controllerTableauIngredient(cnx,user,labCombox.getValue());
+        fxmlLoader.setController(controllerTableauIngredient);
+
+        Parent root = fxmlLoader.load();
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) buttonIngredient.getScene().getWindow();
+        stage.setTitle("Ingredient");
+        stage.setScene(scene);
+        stage.centerOnScreen();
     }
 
     private void displayAddUser() {
