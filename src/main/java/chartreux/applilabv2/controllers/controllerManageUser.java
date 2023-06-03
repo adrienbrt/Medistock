@@ -236,7 +236,6 @@ public class controllerManageUser implements Initializable {
         }else{
             listLabRole.clear();
             labelErrorRole.setText("");
-            System.out.println(labRole.containsKey(comboLabo.getValue()));
 
             if (labRole.containsKey(comboLabo.getValue())){
                 Role old = labRole.get(comboLabo.getValue());
@@ -251,9 +250,6 @@ public class controllerManageUser implements Initializable {
             });
 
 
-            System.out.println(labRole.size());
-            System.out.println(listLabRole.size());
-
             // Convertissez la liste en une ObservableList
             ObservableList<HashMap<Laboratoire, Role>> ObservableList = FXCollections.observableArrayList(listLabRole);
 
@@ -267,7 +263,6 @@ public class controllerManageUser implements Initializable {
     }
 
     private void suppRole(){
-
 
 
     }

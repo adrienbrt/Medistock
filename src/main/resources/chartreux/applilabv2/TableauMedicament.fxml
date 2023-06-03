@@ -1,13 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0">
 
-</AnchorPane>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <AnchorPane prefHeight="85.0" prefWidth="1150.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="labelLabo" layoutX="59.0" layoutY="35.0" prefHeight="16.0" prefWidth="293.0" text="Médicament du laboratoire" />
+            <Button fx:id="btnHome" layoutX="871.0" layoutY="31.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="193.0" text="Accueil" />
+            <Button fx:id="btnAddMedoc" layoutX="645.0" layoutY="31.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="193.0" text="Ajouter médicament" />
+         </children>
+      </AnchorPane>
+   </top>
+   <left>
+      <AnchorPane prefHeight="615.0" prefWidth="575.0" BorderPane.alignment="CENTER">
+         <children>
+            <TableView fx:id="tableMedoc" layoutX="48.0" layoutY="92.0" prefHeight="432.0" prefWidth="480.0">
+              <columns>
+                <TableColumn fx:id="columnMedoc" prefWidth="143.0" text="Medicament" />
+                <TableColumn fx:id="columnForme" prefWidth="94.0" text="Forme" />
+                  <TableColumn fx:id="columnIngredient" prefWidth="128.0" text="Ingrédient" />
+                  <TableColumn fx:id="columnQtt" prefWidth="114.0" text="Quantité" />
+              </columns>
+            </TableView>
+         </children>
+      </AnchorPane>
+   </left>
+   <right>
+      <AnchorPane prefHeight="615.0" prefWidth="575.0" BorderPane.alignment="CENTER">
+         <children>
+            <ComboBox fx:id="comboMissing" layoutX="228.0" layoutY="69.0" prefHeight="24.0" prefWidth="239.0" />
+            <Label layoutX="38.0" layoutY="73.0" prefHeight="16.0" prefWidth="176.0" text="Médicament manquant :" />
+            <Label layoutX="38.0" layoutY="144.0" prefHeight="16.0" prefWidth="101.0" text="Médiamnent :" />
+            <Label fx:id="labelMedocChoose" layoutX="229.0" layoutY="144.0" prefHeight="16.0" prefWidth="241.0" />
+            <Label layoutX="38.0" layoutY="199.0" prefHeight="16.0" prefWidth="57.0" text="Forme : " />
+            <TextField fx:id="fieldForme" layoutX="228.0" layoutY="195.0" prefHeight="24.0" prefWidth="242.0" />
+            <Label layoutX="38.0" layoutY="258.0" text="Description :" />
+            <TextArea fx:id="textDescrip" layoutX="229.0" layoutY="258.0" prefHeight="97.0" prefWidth="249.0" />
+            <Label layoutX="38.0" layoutY="393.0" text="Ingrédient :" />
+            <ComboBox fx:id="comboIngred" layoutX="228.0" layoutY="389.0" prefHeight="24.0" prefWidth="252.0" />
+            <Spinner fx:id="spinQtt" layoutX="228.0" layoutY="450.0" prefHeight="24.0" prefWidth="252.0" />
+            <Label layoutX="37.0" layoutY="454.0" prefHeight="16.0" prefWidth="78.0" text="Quantité :" />
+            <Button fx:id="btnUpdate" layoutX="364.0" layoutY="539.0" mnemonicParsing="false" text="Mettre a jour" />
+            <Button fx:id="btnSupLabo" layoutX="160.0" layoutY="539.0" mnemonicParsing="false" text="Supprimer du labo" />
+         </children>
+      </AnchorPane>
+   </right>
+</BorderPane>

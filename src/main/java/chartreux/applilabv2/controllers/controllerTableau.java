@@ -108,6 +108,30 @@ public class controllerTableau implements Initializable {
             }
         });
 
+        buttonMedoc.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    openMedicamentTable();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+    }
+
+    private void openMedicamentTable() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauMedicament.fxml"));
+        controllerTableauMedicament controllerTableauMedicament = new controllerTableauMedicament(cnx,labCombox.getValue(),user);
+        fxmlLoader.setController(controllerTableauMedicament);
+
+        Parent root = fxmlLoader.load();
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) buttonMedoc.getScene().getWindow();
+        stage.setTitle("Médicament");
+        stage.setScene(scene);
+        stage.centerOnScreen();
     }
 
     /**
