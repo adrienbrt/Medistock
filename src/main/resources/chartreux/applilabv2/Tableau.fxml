@@ -8,7 +8,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <top>
-      <AnchorPane prefHeight="80.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="85.0" prefWidth="1150.0" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="welcomeLabel" layoutX="51.0" layoutY="32.0" prefHeight="16.0" prefWidth="161.0" text="test" />
             <Button fx:id="buttonAddUser" layoutX="505.0" layoutY="18.0" lineSpacing="1.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="127.0" text="Ajout Utilisateur" />
