@@ -20,9 +20,16 @@
       </AnchorPane>
    </top>
    <right>
-      <AnchorPane prefHeight="620.0" prefWidth="575.0" BorderPane.alignment="CENTER" />
+      <AnchorPane prefHeight="620.0" prefWidth="575.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="222.0" layoutY="99.0" text="Prochaine commande :" />
+         </children></AnchorPane>
    </right>
    <left>
-      <AnchorPane prefHeight="620.0" prefWidth="575.0" BorderPane.alignment="CENTER" />
+      <AnchorPane prefHeight="620.0" prefWidth="575.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label layoutX="77.0" layoutY="97.0" prefHeight="19.0" prefWidth="211.0" text="Ingredient bientot en rupture :" />
+            <Label layoutX="77.0" layoutY="213.0" text="Medicament bientot en rupture :" />
+         </children></AnchorPane>
    </left>
 </BorderPane>

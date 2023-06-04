@@ -13,6 +13,8 @@ public class Ingredient {
         return id;
     }
 
+
+
     public void setId(String id) {
         this.id = id;
     }
@@ -23,5 +25,13 @@ public class Ingredient {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "id='" + id + '\'' +
+                ", nom='" + nom + '\'' +
+                '}';
     }
 }

@@ -177,7 +177,11 @@ public class controllerTableauMedicament implements Initializable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        
+
+        if (Objects.equals(role.getId(), "role3")){
+            btnSupLabo.setVisible(false);
+        }
+
         /*Valeur du spin */
         spinQtt.setDisable(true);
         comboIngred.valueProperty().addListener((observable, oldValue, newValue)->{
@@ -187,6 +191,7 @@ public class controllerTableauMedicament implements Initializable {
                 spinQtt.setDisable(false);
                 if(tableMedoc.getSelectionModel().isEmpty()){
                     btnUpdate.setText("Ajouter médicament au labo");
+                    btnUpdate.setDisable(false);
                     try {
                         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,daoIngredient.getQttOneIngredientLab(newValue,laboratoire),0);
                         spinQtt.setValueFactory(valueFactory);
@@ -262,7 +267,6 @@ public class controllerTableauMedicament implements Initializable {
                 doComboMissing();
             }
         });
-
     }
 
     private void doDeleteFromLab() {
@@ -291,6 +295,9 @@ public class controllerTableauMedicament implements Initializable {
                 if (buttonType == buttonTypeYes) {
                     try {
                         daoMedicament.deleteMedocLab(medicamentIntegerPair.getKey(),laboratoire);
+                        List<Pair<Medicament, Integer>> updatedList = daoMedicament.findMedicamentLab(laboratoire);
+                        ObservableList<Pair<Medicament, Integer>> updatedObservableList = FXCollections.observableArrayList(updatedList);
+                        tableMedoc.setItems(updatedObservableList);
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     }
@@ -321,12 +328,13 @@ public class controllerTableauMedicament implements Initializable {
 
     private void doUpdate() throws SQLException {
         Pair<Medicament,Integer> pair = tableMedoc.getSelectionModel().getSelectedItem();
+
         //cas ou on applique les modif a un medoc qui existe deja
         if(pair != null){
             //si utilisateur est un simple user
             if(Objects.equals(role.getId(), "role3")){
                 try {
-                    new DAOIngredient(cnx).updateIngredientValue(spinQtt.getValue(),pair.getKey().getIngredient(),laboratoire);
+                    new DAOIngredient(cnx).updateIngredientValue( spinQtt.getValue() -pair.getValue() ,pair.getKey().getIngredient(),laboratoire);
                     daoMedicament.updateMedocLab(pair.getKey(),laboratoire,spinQtt.getValue());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -334,7 +342,7 @@ public class controllerTableauMedicament implements Initializable {
             //si utilisateur a du pouvoir
             }else{
                 try {
-                    new DAOIngredient(cnx).updateIngredientValue(spinQtt.getValue(),pair.getKey().getIngredient(),laboratoire);
+                    new DAOIngredient(cnx).updateIngredientValue(spinQtt.getValue() - pair.getValue(),pair.getKey().getIngredient(),laboratoire);
                     daoMedicament.updateMedocLab(pair.getKey(),laboratoire,spinQtt.getValue());
                     Medicament newMedicament = new Medicament(pair.getKey().getId(),pair.getKey().getNom(),fieldForme.getText(),textDescrip.getText(),comboIngred.getValue());
                     daoMedicament.updateMedoc(newMedicament);
@@ -342,6 +350,7 @@ public class controllerTableauMedicament implements Initializable {
                     throw new RuntimeException(e);
                 }
             }
+        //cas ou le medoc n'est pas encore dans le tableau
         }else{
             if(Objects.equals(role.getId(), "role3")){
                 try {

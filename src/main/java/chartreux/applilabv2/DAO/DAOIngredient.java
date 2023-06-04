@@ -161,10 +161,11 @@ public class DAOIngredient {
         return nb;
     }
 
-    public void updateIngredientValue(Integer newQttRM,Ingredient ingredient,Laboratoire laboratoire) throws SQLException {
+    public void updateIngredientValue(Integer newQtt,Ingredient ingredient,Laboratoire laboratoire) throws SQLException {
         Integer oldQtt = getQttOneIngredientLab(ingredient,laboratoire);
-        Integer newQtt = oldQtt - (newQttRM-oldQtt);
-        updateIngredientLab(ingredient,laboratoire,newQtt);
+        Integer newQttCalc = oldQtt-newQtt;
+
+        updateIngredientLab(ingredient,laboratoire,newQttCalc);
     }
 
 }
