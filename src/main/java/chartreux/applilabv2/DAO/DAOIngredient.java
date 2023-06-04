@@ -37,6 +37,23 @@ public class DAOIngredient {
         return ingredient;
     }
 
+    public List<Ingredient> findAll() throws SQLException {
+        List<Ingredient> ingredientList =new ArrayList<>();
+        String sql = "SELECT * FROM ingredients";
+        PreparedStatement ps =cnx.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()){
+            Ingredient ingredient = new Ingredient(
+                    rs.getString("id"),
+                    rs.getString("nom")
+            );
+            ingredientList.add(ingredient);
+        }
+        return  ingredientList;
+
+    }
+
     public List<Pair<Ingredient, Integer>> findIngredientLab(Laboratoire laboratoire) throws SQLException {
         List<Pair<Ingredient, Integer>> listPair = new ArrayList<>();
         String sql = "SELECT i.id,i.nom, si.quantite FROM ingredients i JOIN stock_ingredients si ON i.id = si.ingredient_id WHERE si.laboratoire_id = ?;";
@@ -110,7 +127,7 @@ public class DAOIngredient {
     }
 
     public void addIngredientFromLab(Ingredient leIngredient, Laboratoire leLabo, Integer qtt) throws SQLException {
-        String sql = "INSERT INTO pharmav2.stock_ingredients (ingredient_id, laboratoire_id, quantite) VALUES(?, ?, ?);";
+        String sql = "INSERT INTO stock_ingredients (ingredient_id, laboratoire_id, quantite) VALUES(?, ?, ?);";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1,leIngredient.getId());
         ps.setString(2,leLabo.getId());
@@ -121,13 +138,33 @@ public class DAOIngredient {
     }
 
     public void updateIngredientLab(Ingredient leIngredient, Laboratoire leLabo, Integer qtt) throws SQLException {
-        String sql = "UPDATE pharmav2.stock_ingredients SET quantite=? WHERE ingredient_id=? AND laboratoire_id=?;";
+        String sql = "UPDATE stock_ingredients SET quantite=? WHERE ingredient_id=? AND laboratoire_id=?;";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setInt(1, qtt);
         ps.setString(2, leIngredient.getId());
         ps.setString(3, leLabo.getId());
 
         ps.executeUpdate();
+    }
+
+    public Integer getQttOneIngredientLab(Ingredient ingredient,Laboratoire laboratoire) throws SQLException {
+        int nb = 0;
+        String sql = "SELECT quantite FROM stock_ingredients WHERE ingredient_id = ? AND laboratoire_id = ?";
+        PreparedStatement ps = cnx.prepareStatement(sql);
+        ps.setString(1,ingredient.getId());
+        ps.setString(2,laboratoire.getId());
+        try (ResultSet rs = ps.executeQuery()){
+            if(rs.next()){
+                nb = rs.getInt("quantite");
+            }
+        }
+        return nb;
+    }
+
+    public void updateIngredientValue(Integer newQttRM,Ingredient ingredient,Laboratoire laboratoire) throws SQLException {
+        Integer oldQtt = getQttOneIngredientLab(ingredient,laboratoire);
+        Integer newQtt = oldQtt - (newQttRM-oldQtt);
+        updateIngredientLab(ingredient,laboratoire,newQtt);
     }
 
 }

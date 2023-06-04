@@ -136,7 +136,6 @@ public class controllerTableau implements Initializable {
 
     /**
      * Ouverture de la page des ingrédients
-     * @throws IOException
      */
     private void openIngredientTable() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauIngredient.fxml"));

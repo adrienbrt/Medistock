@@ -194,7 +194,21 @@ public class DAOUser {
         System.out.println("ajouter");
     }
 
-
+    public Role userGetRoleLab(User user, Laboratoire laboratoire) throws SQLException {
+        Role role = null;
+        String sql = "SELECT r.id, r.libelle FROM role r JOIN userInLab uil ON r.id = uil.roleId WHERE uil.userId = ? AND uil.labId = ? ;";
+        PreparedStatement ps = cnx.prepareStatement(sql);
+        ps.setString(1, user.getId());
+        ps.setString(2, laboratoire.getId());
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()){
+            role = new Role(
+                    rs.getString("id"),
+                    rs.getString("libelle")
+            );
+        }
+        return role;
+    }
 
     public void Create() throws SQLException{
         String idUser = (count()+1) +"user";
