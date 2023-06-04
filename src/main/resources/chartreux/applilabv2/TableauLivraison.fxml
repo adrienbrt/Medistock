@@ -9,29 +9,28 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1150.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <AnchorPane prefHeight="85.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="45.0" layoutY="35.0" prefHeight="16.0" prefWidth="276.0" text="Commande du laboratoire">
+            <Label fx:id="labelLabo" layoutX="45.0" layoutY="35.0" prefHeight="16.0" prefWidth="276.0" text="Commande du laboratoire">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Button layoutX="962.0" layoutY="32.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="142.0" text="Acceuil" />
-            <Button layoutX="770.0" layoutY="32.0" mnemonicParsing="false" text="Nouvelle commande" />
+            <Button fx:id="btnHome" layoutX="962.0" layoutY="32.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="142.0" text="Acceuil" />
+            <Button fx:id="btnNewCmd" layoutX="770.0" layoutY="32.0" mnemonicParsing="false" text="Nouvelle commande" />
          </children>
       </AnchorPane>
    </top>
    <left>
       <AnchorPane prefHeight="200.0" prefWidth="575.0" BorderPane.alignment="CENTER">
          <children>
-            <TableView layoutX="62.0" layoutY="88.0" prefHeight="440.0" prefWidth="451.0">
+            <TableView fx:id="tableCmd" layoutX="62.0" layoutY="88.0" prefHeight="440.0" prefWidth="451.0">
               <columns>
-                <TableColumn prefWidth="135.0" text="Date" />
-                <TableColumn prefWidth="143.0" text="Etat" />
-                  <TableColumn prefWidth="172.0" text="Nombre d'ingredients" />
+                <TableColumn fx:id="columnDate" prefWidth="135.0" text="Date" />
+                <TableColumn fx:id="columnEtat" prefWidth="143.0" text="Etat" />
+                  <TableColumn fx:id="columnNbIng" prefWidth="172.0" text="Nombre d'ingredients" />
               </columns>
             </TableView>
          </children>
@@ -40,18 +39,18 @@
    <right>
       <AnchorPane prefHeight="200.0" prefWidth="575.0" BorderPane.alignment="CENTER">
          <children>
-            <TableView layoutX="240.0" layoutY="86.0" prefHeight="200.0" prefWidth="253.0">
+            <TableView fx:id="tableDetail" layoutX="240.0" layoutY="86.0" prefHeight="200.0" prefWidth="253.0">
               <columns>
-                <TableColumn prefWidth="155.0" text="Ingredient" />
-                <TableColumn prefWidth="97.0" text="Quantité" />
+                <TableColumn fx:id="columnIng" prefWidth="155.0" text="Ingredient" />
+                <TableColumn fx:id="columnQtt" prefWidth="97.0" text="Quantité" />
               </columns>
             </TableView>
             <Label layoutX="63.0" layoutY="92.0" prefHeight="16.0" prefWidth="126.0" text="Détail commande :" />
             <Label layoutX="63.0" layoutY="318.0" text="Date commande :" />
             <Label layoutX="63.0" layoutY="372.0" prefHeight="16.0" prefWidth="155.0" text="Etat de la commande :" />
-            <Label layoutX="240.0" layoutY="318.0" prefHeight="16.0" prefWidth="204.0" text="date commande" />
-            <ComboBox layoutX="240.0" layoutY="368.0" prefHeight="24.0" prefWidth="261.0" />
-            <Button layoutX="165.0" layoutY="457.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="246.0" text="Modifier l'etat de la commande" />
+            <Label fx:id="labelDate" layoutX="240.0" layoutY="318.0" prefHeight="16.0" prefWidth="204.0" text="date commande" />
+            <ComboBox fx:id="comboEtat" layoutX="240.0" layoutY="368.0" prefHeight="24.0" prefWidth="261.0" />
+            <Button fx:id="btnModifEtat" layoutX="165.0" layoutY="457.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="246.0" text="Modifier l'etat de la commande" />
          </children>
       </AnchorPane>
    </right>
