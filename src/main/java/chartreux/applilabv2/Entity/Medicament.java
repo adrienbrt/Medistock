@@ -4,7 +4,8 @@ public class Medicament {
     private String id;
     private String nom;
     private String forme;
-    private String description;private Ingredient ingredient;
+    private String description;
+    private Ingredient ingredient;
 
     public Medicament(String id, String nom, String forme, String description, Ingredient ingredient) {
         this.id = id;
