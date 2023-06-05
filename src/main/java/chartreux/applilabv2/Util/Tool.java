@@ -27,12 +27,14 @@ public class Tool {
         return false; // La clé n'a pas été trouvée dans la liste
     }
 
-    public static <K, V> boolean checkValueExists(List<Pair<K, V>> list, Role role) {
-        for (Pair<K, V> pair : list) {
-            if (pair.getValue().equals(role)) {
-                return true; // La valeur existe dans la liste
+
+
+    public static Role checkRole(List<Pair<Laboratoire, Role>> list, Laboratoire laboratoire) {
+        for (Pair<Laboratoire, Role> pair : list) {
+            if (pair.getKey().equals(laboratoire)) {
+                return pair.getValue(); // La valeur existe dans la liste
             }
         }
-        return false; // La valeur n'a pas été trouvée dans la liste
+        return null; // La valeur n'a pas été trouvée dans la liste
     }
 }

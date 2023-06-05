@@ -2,7 +2,6 @@ package chartreux.applilabv2.DAO;
 import chartreux.applilabv2.Entity.Laboratoire;
 import chartreux.applilabv2.Entity.Role;
 import chartreux.applilabv2.Entity.User;
-import chartreux.applilabv2.Entity.UserInLab;
 import javafx.util.Pair;
 
 import java.sql.Connection;
@@ -10,9 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DAOUser {
     private Connection cnx;
@@ -143,7 +140,6 @@ public class DAOUser {
         return lesLabRole;
     }
 
-
     public void CreateSup(User user) throws SQLException{
         String idUser = (count()+1) +"user";
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 1);";
@@ -196,11 +192,6 @@ public class DAOUser {
         return role;
     }
 
-    public void Create() throws SQLException{
-        String idUser = (count()+1) +"user";
-        System.out.println(idUser);
-
-    }
     public int count() throws SQLException {
         int count = 0;
         String SQL = "SELECT COUNT(*) FROM utilisateurs";

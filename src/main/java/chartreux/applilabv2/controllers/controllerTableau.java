@@ -1,6 +1,6 @@
 package chartreux.applilabv2.controllers;
 
-import chartreux.applilabv2.DAO.DAOUserInLab;
+import chartreux.applilabv2.DAO.DAOUser;
 import chartreux.applilabv2.Entity.Laboratoire;
 import chartreux.applilabv2.Entity.Role;
 import chartreux.applilabv2.Entity.User;
@@ -9,11 +9,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import chartreux.applilabv2.HelloApplication;
+import chartreux.applilabv2.Util.Tool;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import javafx.util.StringConverter;
 
 public class controllerTableau implements Initializable {
@@ -44,8 +44,7 @@ public class controllerTableau implements Initializable {
     private Button buttonAddUser;
     private final Connection cnx;
     private final User user;
-
-    private HashMap<Laboratoire, Role> lesLaboRole;
+    private List<Pair<Laboratoire, Role>> lesLaboRole;
 
     public controllerTableau(Connection cnx, User user) {
         this.cnx = cnx;
@@ -54,17 +53,23 @@ public class controllerTableau implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        welcomeLabel.setText("Bienvenu "+user.getPrenom());
+        lesLaboRole =new ArrayList<>();
 
+        welcomeLabel.setText("Bienvenue "+user.getPrenom());
 
         try {
-            lesLaboRole = new DAOUserInLab(cnx).getLesLabRole(user.getId());
+            lesLaboRole = new DAOUser(cnx).getLesLaboRole(user.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
-        ObservableList<Laboratoire> lesLabos = FXCollections.observableArrayList(lesLaboRole.keySet());
+        ObservableList<Laboratoire> lesLabos = FXCollections.observableArrayList();
+        for (Pair<Laboratoire,Role> leLaboRole: lesLaboRole){
+            lesLabos.add(leLaboRole.getKey());
+        }
         labCombox.setItems(lesLabos);
+
+        labCombox.setValue(lesLabos.get(0));
 
         labCombox.setConverter(new StringConverter<Laboratoire>() {
             @Override
@@ -77,18 +82,12 @@ public class controllerTableau implements Initializable {
             }
         });
 
-        labCombox.setValue(lesLabos.get(0));
-
         labCombox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 displayAddUser();
             }
         });
-
-        if(Objects.equals(lesLaboRole.get(labCombox.getValue()).getId(), "role3")){
-            buttonAddUser.setVisible(false);
-        }
 
         buttonAddUser.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -180,7 +179,7 @@ public class controllerTableau implements Initializable {
     }
 
     private void displayAddUser() {
-        buttonAddUser.setVisible(!Objects.equals(lesLaboRole.get(labCombox.getValue()).getId(), "role3"));
+        buttonAddUser.setVisible(Objects.requireNonNull(Tool.checkRole(lesLaboRole, labCombox.getValue())).getId() != "role3");
     }
     
     private void doAddUser(){
