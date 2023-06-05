@@ -1,7 +1,6 @@
 package chartreux.applilabv2.controllers;
 
 import chartreux.applilabv2.DAO.DAOIngredient;
-import chartreux.applilabv2.DAO.DAOUser;
 import chartreux.applilabv2.Entity.Laboratoire;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -68,7 +67,7 @@ public class controllerAddIngredient implements Initializable {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Attention");
             alert.setHeaderText("Nom manquant");
-            alert.setContentText("le champs doit etre remplis");
+            alert.setContentText("le champ doit etre remplis");
 
             alert.showAndWait();
         }else{

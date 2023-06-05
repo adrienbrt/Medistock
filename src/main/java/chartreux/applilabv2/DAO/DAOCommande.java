@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class DAOCommande {
             Commande commande = new Commande(
                     rs.getString("commande_id"),
                     daoLaboratoire.findId(rs.getString("laboratoire_id")),
-                    rs.getDate("date"),
+                    rs.getDate("date").toLocalDate(),
                     daoEtat.find(rs.getString("etat_id"))
             );
             pairList.add(new Pair<>(commande, rs.getInt("nombre_ingredients")));
@@ -63,5 +64,44 @@ public class DAOCommande {
         ps.setString(2, commande.getId());
 
         ps.executeUpdate();
+    }
+
+    public void create(Commande commande) throws SQLException{
+        String id = "cmd"+(count()+1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String sql = "INSERT INTO commande (id, laboratoire_id, `date`, etat_id) VALUES(?, ?, ?, ?);";
+        PreparedStatement ps = cnx.prepareStatement(sql);
+        ps.setString(1,id);
+        ps.setString(2,commande.getLaboratoire().getId());
+        ps.setString(3, commande.getDate().format(formatter));
+        ps.setString(4,commande.getEtat().getId());
+        
+        ps.executeUpdate();
+        ps.clearParameters();
+        
+        sql = "INSERT INTO commandeDet (commande_id, ingredient_id, quantite) VALUES(?, ?, ?);";
+        ps = cnx.prepareStatement(sql);
+        for (Pair<Ingredient,Integer> pair: commande.getListDetail()) {
+            ps.setString(1,id);
+            ps.setString(2, pair.getKey().getId());
+            ps.setInt(3, pair.getValue());
+
+            ps.executeUpdate();
+            ps.clearParameters();
+        }
+        
+        
+
+    }
+
+    public int count() throws SQLException {
+        int count = 0;
+        String SQL = "SELECT COUNT(*) FROM commande";
+        PreparedStatement ps = cnx.prepareStatement(SQL);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            count = rs.getInt(1);
+        }
+        return count;
     }
 }

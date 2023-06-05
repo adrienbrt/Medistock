@@ -2,17 +2,18 @@ package chartreux.applilabv2.Entity;
 
 import javafx.util.Pair;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 public class Commande {
     private String id;
     private Laboratoire laboratoire;
-    private Date date;
+    private LocalDate date;
     private Etat etat;
     private List<Pair<Ingredient,Integer>> listDetail;
 
-    public Commande(String id, Laboratoire laboratoire, Date date, Etat etat, List<Pair<Ingredient, Integer>> listDetail) {
+    public Commande(String id, Laboratoire laboratoire, LocalDate date, Etat etat, List<Pair<Ingredient, Integer>> listDetail) {
         this.id = id;
         this.laboratoire = laboratoire;
         this.date = date;
@@ -20,7 +21,7 @@ public class Commande {
         this.listDetail = listDetail;
     }
 
-    public Commande(String id, Laboratoire laboratoire, Date date, Etat etat) {
+    public Commande(String id, Laboratoire laboratoire, LocalDate date, Etat etat) {
         this.id = id;
         this.laboratoire = laboratoire;
         this.date = date;
@@ -46,11 +47,11 @@ public class Commande {
         this.laboratoire = laboratoire;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
