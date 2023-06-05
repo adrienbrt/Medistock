@@ -1,6 +1,9 @@
 package chartreux.applilabv2.Entity;
 
+import javafx.util.Pair;
+
 import java.util.HashMap;
+import java.util.List;
 
 public class User {
     private String id;
@@ -11,18 +14,18 @@ public class User {
 
     private boolean isAdmin;
 
-    private HashMap<Laboratoire,Role> laboratoires;
+    private List<Pair<Laboratoire,Role>> lesLaboUtil;
 
-    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, HashMap<Laboratoire,Role> laboratoires) {
+    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, List<Pair<Laboratoire,Role>> lesLaboUtil) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.nom = nom;
         this.prenom = prenom;
         this.isAdmin = isAdmin;
-        this.laboratoires = laboratoires;
+        this.lesLaboUtil = lesLaboUtil;
     }
-    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, String laboratoires) {
+    public User(String id, String login, String password, String nom, String prenom, boolean isAdmin, String lesLaboUtil) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -92,12 +95,12 @@ public class User {
         this.isAdmin = isAdmin;
     }
 
-    public HashMap<Laboratoire, Role> getLaboratoires() {
-        return laboratoires;
+    public List<Pair<Laboratoire,Role>> getlesLaboUtil() {
+        return lesLaboUtil;
     }
 
-    public void setLaboratoires(HashMap<Laboratoire, Role> laboratoires) {
-        this.laboratoires = laboratoires;
+    public void setlesLaboUtil(List<Pair<Laboratoire,Role>> lesLaboUtil) {
+        this.lesLaboUtil = lesLaboUtil;
     }
 
     @Override

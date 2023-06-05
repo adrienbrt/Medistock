@@ -182,12 +182,11 @@ public class controllerTableau implements Initializable {
     private void displayAddUser() {
         buttonAddUser.setVisible(!Objects.equals(lesLaboRole.get(labCombox.getValue()).getId(), "role3"));
     }
-
-
+    
     private void doAddUser(){
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ManageUser.fxml"));
-            controllerManageUser controllerManageUser = new controllerManageUser(cnx,user);
+            controllerManageUser controllerManageUser = new controllerManageUser(cnx,user,labCombox.getValue());
             fxmlLoader.setController(controllerManageUser);
 
             Parent root = fxmlLoader.load();

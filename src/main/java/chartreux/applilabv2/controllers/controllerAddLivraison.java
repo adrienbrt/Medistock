@@ -171,7 +171,7 @@ public class controllerAddLivraison implements Initializable {
 
             alert.showAndWait();
         }else{
-            if(Tool.checkKeyExists(pairList, comboIng.getValue())){
+            if(Tool.checkKeyExistsIng(pairList, comboIng.getValue())){
                 for (int i = 0; i < pairList.size(); i++) {
                     Pair<Ingredient, Integer> pair = pairList.get(i);
                     if (pair.getKey().equals(comboIng.getValue())) {
@@ -225,7 +225,6 @@ public class controllerAddLivraison implements Initializable {
             Etat etat = new Etat("etat1","En attente");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate date = LocalDate.now();
-            String formattedDate = date.format(formatter);
             Commande commande = new Commande("idNew", laboratoire, date, etat, pairList);
             daoCommande.create(commande);
 
