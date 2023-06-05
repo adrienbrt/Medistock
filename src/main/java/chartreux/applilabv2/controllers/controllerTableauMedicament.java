@@ -387,6 +387,18 @@ public class controllerTableauMedicament implements Initializable {
         stage.setTitle("ajouter médicament");
         stage.setScene(new Scene(root));
         stage.show();
+
+        stage.setOnHidden(event->{
+            ObservableList<Medicament> missingMedoc = null;
+            try {
+                missingMedoc = FXCollections.observableArrayList(daoMedicament.missingMedicLab(laboratoire));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            missingMedoc.add(null);
+            comboMissing.setItems(missingMedoc);
+        });
+
     }
 
     private void doSelectItem(MouseEvent mouseEvent) {

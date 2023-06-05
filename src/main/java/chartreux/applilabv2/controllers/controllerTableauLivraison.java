@@ -186,6 +186,16 @@ public class controllerTableauLivraison implements Initializable {
         stage.setTitle("ajouter commande");
         stage.setScene(new Scene(root));
         stage.show();
+
+        stage.setOnHidden(event -> {
+            try {
+                ObservableList<Pair<Commande, Integer>> observableListCmd = FXCollections.observableArrayList(daoCommande.findAllCommandeLabNbIng(laboratoire));
+                tableCmd.setItems(observableListCmd);
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void doHome() throws IOException {

@@ -1,6 +1,7 @@
 package chartreux.applilabv2.controllers;
 
 import chartreux.applilabv2.DAO.DAOIngredient;
+import chartreux.applilabv2.Entity.Commande;
 import chartreux.applilabv2.Entity.Ingredient;
 import chartreux.applilabv2.Entity.Laboratoire;
 import chartreux.applilabv2.Entity.User;
@@ -309,6 +310,15 @@ public class controllerTableauIngredient implements Initializable {
         stage.setTitle("ajouter ingredients");
         stage.setScene(new Scene(root));
         stage.show();
+
+        stage.setOnHidden(event -> {
+            try {
+                ObservableList<Ingredient> missingIng = FXCollections.observableList(new DAOIngredient(cnx).missingIngredientLab(laboratoire));
+                comboMissing.setItems(missingIng);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void backHome() throws IOException {

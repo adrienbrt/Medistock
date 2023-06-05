@@ -80,7 +80,7 @@ public class DAOMedicament {
     }
 
     public void createMedoc(Medicament medicament) throws SQLException {
-        String id = "ing" + (count()+1);
+        String id = "med" + (count()+1);
         String sql = "INSERT INTO medicaments (id, nom, forme, description, ingredient_id) VALUES(?, ?, ?, ?, ?);";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1,id);
