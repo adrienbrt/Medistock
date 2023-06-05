@@ -20,6 +20,13 @@ public class Commande {
         this.listDetail = listDetail;
     }
 
+    public Commande(String id, Laboratoire laboratoire, Date date, Etat etat) {
+        this.id = id;
+        this.laboratoire = laboratoire;
+        this.date = date;
+        this.etat = etat;
+    }
+
     public Commande() {
     }
 

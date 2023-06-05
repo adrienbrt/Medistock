@@ -118,9 +118,38 @@ public class controllerTableau implements Initializable {
                 }
             }
         });
+        
+        buttonCommande.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    openCommandeTable();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
     }
+    /**
+     * Ouverture de la page des commandes)
+     */
+    private void openCommandeTable() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauLivraison.fxml"));
+        controllerTableauLivraison controllerTableauLivraison = new controllerTableauLivraison(cnx,labCombox.getValue(),user);
+        fxmlLoader.setController(controllerTableauLivraison);
 
+        Parent root = fxmlLoader.load();
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) buttonCommande.getScene().getWindow();
+        stage.setTitle("Commande");
+        stage.setScene(scene);
+        stage.centerOnScreen();
+    }
+
+    /**
+     * Ouverture de la page des medicaments
+     */
     private void openMedicamentTable() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauMedicament.fxml"));
         controllerTableauMedicament controllerTableauMedicament = new controllerTableauMedicament(cnx,labCombox.getValue(),user);
