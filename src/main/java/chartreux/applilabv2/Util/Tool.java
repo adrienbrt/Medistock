@@ -18,8 +18,8 @@ public class Tool {
         return false; // La clé n'a pas été trouvée dans la liste
     }
 
-    public static <K, V>  boolean checkKeyExistsLabo(List<Pair<K, V>> list, Laboratoire key) {
-        for (Pair<K, V> pair : list) {
+    public static boolean checkKeyExistsLabo(List<Pair<Laboratoire, Role>> list, Laboratoire key) {
+        for (Pair<Laboratoire, Role> pair : list) {
             if (pair.getKey().equals(key)) {
                 return true; // La clé existe déjà dans la liste
             }

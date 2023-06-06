@@ -40,8 +40,8 @@ public class controllerLogin {
 
         if(!usernameLabel.getText().isBlank() && !passwordLabel.getText().isBlank()){
             loginMessageLabel.setText("tentative de connexion");
-//            User user = new DAOUser(cnx).findConnect(usernameLabel.getText(),passwordLabel.getText());
-            User user = new DAOUser(cnx).findConnect("Superadmin","123+aze");
+            User user = new DAOUser(cnx).findConnect(usernameLabel.getText(),passwordLabel.getText());
+//            User user = new DAOUser(cnx).findConnect("Superadmin","123+aze");
 
             if (user == null){
                 loginMessageLabel.setText("mauvais identifiants");

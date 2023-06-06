@@ -23,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 
@@ -58,6 +59,9 @@ public class controllerManageUser implements Initializable {
     @FXML
     private Button addLabRole;
     @FXML
+    private Button btnUpdate;
+
+    @FXML
     private TableColumn<Pair<Laboratoire, Role>, String> laboColumn;
     @FXML
     private TableColumn<Pair<Laboratoire, Role>, String> roleColumn;
@@ -80,6 +84,7 @@ public class controllerManageUser implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        btnUpdate.setVisible(false);
 
         listLabRole = new ArrayList<>();
         listUsers = new ArrayList<>();
@@ -161,31 +166,18 @@ public class controllerManageUser implements Initializable {
         });
 
         /*Selection un utilisateur*/
-        tableView.setOnMouseClicked(mouseEvent -> {
-            User selected = tableView.getSelectionModel().getSelectedItem();
-            listLabRole.clear();
+        tableView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                doSelectUser(mouseEvent);
+            }
+        });
 
-            if (selected != null) {
-                if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
-                    tableView.getSelectionModel().clearSelection();
-                    fieldLogin.setText("");
-                    fieldNom.setText("");
-                    fieldPrenom.setText("");
-                    fieldPassword.setText("");
-                    tableLabRole.getItems().clear();
-                    listLabRole.clear();
-                }else{
-                    fieldLogin.setText(selected.getLogin());
-                    fieldPrenom.setText(selected.getPrenom());
-                    fieldNom.setText(selected.getNom());
-
-                    if(selected.getlesLaboUtil().isEmpty()){
-                        tableLabRole.getItems().clear();
-                    }else {
-                        ObservableList<Pair<Laboratoire, Role>> selectedObservableList = FXCollections.observableArrayList(selected.getlesLaboUtil());
-                        tableLabRole.setItems(selectedObservableList);
-                    }
-                }
+        /*Selection un roleLabo*/
+        tableLabRole.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                doSelectLabRole(mouseEvent);
             }
         });
 
@@ -217,10 +209,97 @@ public class controllerManageUser implements Initializable {
                 }
             }
         });
+        
+        /*Mise a jours utilisateur*/
+        btnUpdate.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    doUpdateUser();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
     }
 
+    private void doUpdateUser() throws SQLException {
+        String id = tableView.getSelectionModel().getSelectedItem().getId();
+        if(id != null){
+            if(isAdmin){
+                User userUpdate = new User(id,
+                        fieldLogin.getText(),
+                        tableView.getSelectionModel().getSelectedItem().getPassword(),
+                        fieldNom.getText(),fieldPrenom.getText(),
+                        isAdmin);
+                daoUser.updateUser(userUpdate);
+            }else{
+                User userUpdate = new User(id,
+                        fieldLogin.getText(),
+                        tableView.getSelectionModel().getSelectedItem().getPassword(),
+                        fieldNom.getText(),fieldPrenom.getText(),
+                        isAdmin,
+                        listLabRole);
+                daoUser.updateUser(userUpdate);
+            }
+            tableView.getSelectionModel().clearSelection();
+            setupTableUser();
+            fieldLogin.setText("");
+            fieldNom.setText("");
+            fieldPrenom.setText("");
+            fieldPassword.setText("");
+            tableLabRole.getItems().clear();
+            listLabRole.clear();
+            ButtonAdd.setVisible(true);
+            btnUpdate.setVisible(false);
+        }
+    }
 
+    private void doSelectLabRole(MouseEvent mouseEvent) {
+        Pair<Laboratoire,Role> selected = tableLabRole.getSelectionModel().getSelectedItem();
+        if(selected != null){
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
+                comboLabo.setValue(null);
+                comboRole.setValue(null);
+            }else{
+                comboLabo.setValue(selected.getKey());
+                comboRole.setValue(selected.getValue());
+            }
+        }
+    }
+
+    private void doSelectUser(MouseEvent mouseEvent){
+        User selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
+                tableView.getSelectionModel().clearSelection();
+                fieldLogin.setText("");
+                fieldNom.setText("");
+                fieldPrenom.setText("");
+                fieldPassword.setText("");
+                tableLabRole.getItems().clear();
+                listLabRole.clear();
+                ButtonAdd.setVisible(true);
+                btnUpdate.setVisible(false);
+            }else{
+                btnUpdate.setVisible(true);
+                ButtonAdd.setVisible(false);
+                fieldLogin.setText(selected.getLogin());
+                fieldPrenom.setText(selected.getPrenom());
+                fieldNom.setText(selected.getNom());
+
+                if(selected.getlesLaboUtil() != null) {
+                    listLabRole = selected.getlesLaboUtil();
+                    ObservableList<Pair<Laboratoire, Role>> selectedObservableList = FXCollections.observableArrayList(selected.getlesLaboUtil());
+                    tableLabRole.setItems(selectedObservableList);
+                }else {
+                    ObservableList<Pair<Laboratoire, Role>> selectedObservableList = FXCollections.observableArrayList(new ArrayList<>());
+                    tableLabRole.setItems(selectedObservableList);
+                }
+            }
+        }
+    }
     private void addRole(){
         if(comboRole.getValue() == null || (comboLabo.getValue() == null && !Objects.equals(comboRole.getValue().getId(), "role1"))){
             labelErrorRole.setText("vueuillez remplir les champs");

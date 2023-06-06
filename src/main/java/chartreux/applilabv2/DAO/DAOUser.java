@@ -75,14 +75,14 @@ public class DAOUser {
                     rs.getBoolean("role_id"));
             if(!user.getIsAdmin()){
                 List<Pair<Laboratoire, Role>> lesLaboRole = new ArrayList<>();
-                String sql2 = "SELECT l.id AS labId, r.id AS roleId, r.nom AS roleNom" +
-                        "FROM userInLab ul" +
-                        "JOIN laboratoires l ON ul.labId = l.id" +
-                        "JOIN roles r ON ul.roleId = r.id" +
-                        "WHERE ul.userId = ?'";
+                String sql2 = "SELECT l.id AS labId, r.id AS roleId, r.libelle AS roleNom " +
+                        "FROM userInLab ul " +
+                        "JOIN laboratoires l ON ul.labId = l.id " +
+                        "JOIN role r ON ul.roleId = r.id " +
+                        "WHERE ul.userId = ?";
                 PreparedStatement ps2 = cnx.prepareStatement(sql2);
                 ps2.setString(1, user.getId());
-                ResultSet rs2 = ps.executeQuery();
+                ResultSet rs2 = ps2.executeQuery();
                 while (rs2.next()){
                     Role role = new Role( rs2.getString("roleId"), rs2.getString("roleNom"));
                     Laboratoire laboratoire = new DAOLaboratoire(cnx).findId(rs2.getString("labId"));
@@ -94,6 +94,68 @@ public class DAOUser {
             users.add(user);
         }
         return users;
+    }
+
+    public void updateUser(User user) throws SQLException {
+        if(user.getIsAdmin()){
+            String sql = "UPDATE utilisateurs SET login=?, password=?, nom=?, prenom=?, role_id=1 WHERE id=?;";
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getNom());
+            ps.setString(4, user.getPrenom());
+            ps.setString(5, user.getId());
+
+            ps.executeUpdate();
+            sql = "DELETE FROM userInLab WHERE userId=? ;";
+            ps = cnx.prepareStatement(sql);
+            ps.clearParameters();
+            ps.setString(1, user.getId());
+            ps.executeUpdate();
+
+        }else{
+
+            List<String> currentLabIds = new ArrayList<>();
+            String selectCurrentLabIdsSQL = "SELECT labId FROM userInLab WHERE userId = ?";
+            PreparedStatement selectCurrentLabIdsPS = cnx.prepareStatement(selectCurrentLabIdsSQL);
+            selectCurrentLabIdsPS.setString(1, user.getId());
+            ResultSet currentLabIdsRS = selectCurrentLabIdsPS.executeQuery();
+            while (currentLabIdsRS.next()) {
+                currentLabIds.add(currentLabIdsRS.getString("labId"));
+            }
+
+            String sql = "UPDATE utilisateurs SET login=?, password=?, nom=?, prenom=?, role_id=0 WHERE id=?;";
+            PreparedStatement ps = cnx.prepareStatement(sql);
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getNom());
+            ps.setString(4, user.getPrenom());
+            ps.setString(5, user.getId());
+
+            ps.executeUpdate();
+
+            for(Pair<Laboratoire,Role> pair: user.getlesLaboUtil()){
+                currentLabIds.remove(pair.getKey().getId());
+
+                sql = "UPDATE userInLab SET roleId=? WHERE userId=? AND labId=?;";
+                ps = cnx.prepareStatement(sql);
+                ps.clearParameters();
+                ps.setString(1, pair.getValue().getId());
+                ps.setString(2, user.getId());
+                ps.setString(3, pair.getKey().getId());
+
+                ps.executeUpdate();
+            }
+
+            for (String labIdToRemove : currentLabIds) {
+                String deleteLabIdSQL = "DELETE FROM userInLab WHERE userId = ? AND labId = ?";
+                PreparedStatement deleteLabIdPS = cnx.prepareStatement(deleteLabIdSQL);
+                deleteLabIdPS.setString(1, user.getId());
+                deleteLabIdPS.setString(2, labIdToRemove);
+                deleteLabIdPS.executeUpdate();
+            }
+
+        }
     }
 
 
@@ -108,6 +170,7 @@ public class DAOUser {
 
         while (rs.next()){
             Pair<Laboratoire, Role> userLabRole = new Pair<>(laboratoire, new DAORole(cnx).find(rs.getString("roleId")));
+            leRole.clear();
             leRole.add(userLabRole);
             User user = new User(
                     rs.getString("id"),
@@ -115,11 +178,10 @@ public class DAOUser {
                     rs.getString("password"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
-                    rs.getBoolean("role_id"),
-                    leRole
+                    rs.getBoolean("role_id")
             );
+            user.setlesLaboUtil(leRole);
             lesUtilisateurs.add(user);
-            leRole.clear();
         }
         return lesUtilisateurs;
 

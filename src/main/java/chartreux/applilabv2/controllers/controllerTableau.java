@@ -22,9 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -39,9 +37,40 @@ public class controllerTableau implements Initializable {
     @FXML
     private Button buttonMedoc;
     @FXML
-    private ComboBox<Laboratoire> labCombox;
+    private ComboBox<Pair<Laboratoire, Role>> labCombox;
     @FXML
     private Button buttonAddUser;
+
+    @FXML
+    private TableColumn<?, ?> columnDate;
+
+    @FXML
+    private TableColumn<?, ?> columnEtat;
+
+    @FXML
+    private TableColumn<?, ?> columnIng;
+
+    @FXML
+    private TableColumn<?, ?> columnIngQtt;
+
+    @FXML
+    private TableColumn<?, ?> columnMedoc;
+
+    @FXML
+    private TableColumn<?, ?> columnNbIng;
+
+    @FXML
+    private TableColumn<?, ?> columnQttMedoc;
+
+    @FXML
+    private TableView<?> tableIng;
+
+    @FXML
+    private TableView<?> tableLivraison;
+
+    @FXML
+    private TableView<?> tableMedoc;
+
     private final Connection cnx;
     private final User user;
     private List<Pair<Laboratoire, Role>> lesLaboRole;
@@ -63,21 +92,22 @@ public class controllerTableau implements Initializable {
             throw new RuntimeException(e);
         }
 
-        ObservableList<Laboratoire> lesLabos = FXCollections.observableArrayList();
-        for (Pair<Laboratoire,Role> leLaboRole: lesLaboRole){
-            lesLabos.add(leLaboRole.getKey());
-        }
+        ObservableList<Pair<Laboratoire, Role>> lesLabos = FXCollections.observableArrayList(lesLaboRole);
         labCombox.setItems(lesLabos);
-
         labCombox.setValue(lesLabos.get(0));
 
-        labCombox.setConverter(new StringConverter<Laboratoire>() {
+        if(Objects.equals(labCombox.getValue().getValue().getId(), "role3")){
+            buttonAddUser.setVisible(false);
+        }
+
+        labCombox.setConverter(new StringConverter<Pair<Laboratoire, Role>>() {
             @Override
-            public String toString(Laboratoire laboratoire) {
-                return laboratoire != null ? laboratoire.getNom(): "";
+            public String toString(Pair<Laboratoire, Role> laboratoireRolePair) {
+                return laboratoireRolePair != null ? laboratoireRolePair.getKey().getNom() : "";
             }
+
             @Override
-            public Laboratoire fromString(String s) {
+            public Pair<Laboratoire, Role> fromString(String s) {
                 return null;
             }
         });
@@ -135,7 +165,7 @@ public class controllerTableau implements Initializable {
      */
     private void openCommandeTable() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauLivraison.fxml"));
-        controllerTableauLivraison controllerTableauLivraison = new controllerTableauLivraison(cnx,labCombox.getValue(),user);
+        controllerTableauLivraison controllerTableauLivraison = new controllerTableauLivraison(cnx,labCombox.getValue().getKey(),user);
         fxmlLoader.setController(controllerTableauLivraison);
 
         Parent root = fxmlLoader.load();
@@ -151,7 +181,7 @@ public class controllerTableau implements Initializable {
      */
     private void openMedicamentTable() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauMedicament.fxml"));
-        controllerTableauMedicament controllerTableauMedicament = new controllerTableauMedicament(cnx,labCombox.getValue(),user);
+        controllerTableauMedicament controllerTableauMedicament = new controllerTableauMedicament(cnx,labCombox.getValue().getKey(),user);
         fxmlLoader.setController(controllerTableauMedicament);
 
         Parent root = fxmlLoader.load();
@@ -167,7 +197,7 @@ public class controllerTableau implements Initializable {
      */
     private void openIngredientTable() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("TableauIngredient.fxml"));
-        controllerTableauIngredient controllerTableauIngredient = new controllerTableauIngredient(cnx,user,labCombox.getValue());
+        controllerTableauIngredient controllerTableauIngredient = new controllerTableauIngredient(cnx,user,labCombox.getValue().getKey());
         fxmlLoader.setController(controllerTableauIngredient);
 
         Parent root = fxmlLoader.load();
@@ -179,13 +209,13 @@ public class controllerTableau implements Initializable {
     }
 
     private void displayAddUser() {
-        buttonAddUser.setVisible(Objects.requireNonNull(Tool.checkRole(lesLaboRole, labCombox.getValue())).getId() != "role3");
+        buttonAddUser.setVisible(!Objects.equals(labCombox.getValue().getValue().getId(), "role3"));
     }
     
     private void doAddUser(){
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ManageUser.fxml"));
-            controllerManageUser controllerManageUser = new controllerManageUser(cnx,user,labCombox.getValue());
+            controllerManageUser controllerManageUser = new controllerManageUser(cnx,user,labCombox.getValue().getKey());
             fxmlLoader.setController(controllerManageUser);
 
             Parent root = fxmlLoader.load();
