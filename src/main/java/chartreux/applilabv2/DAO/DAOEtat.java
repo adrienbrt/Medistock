@@ -16,6 +16,12 @@ public class DAOEtat {
         this.cnx = cnx;
     }
 
+    /**
+     * Recherche un état par son identifiant.
+     * @param id L'identifiant de l'état à rechercher.
+     * @return L'objet Etat correspondant à l'état trouvé, ou null si aucun état correspondant n'est trouvé.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public Etat find(String id) throws SQLException {
         Etat etat = null;
         String sql = "SELECT * FROM etat WHERE id=?;";
@@ -29,6 +35,11 @@ public class DAOEtat {
         return etat;
     }
 
+    /**
+     * Récupère tous les états présents dans la base de données.
+     * @return Une liste d'objets Etat représentant tous les états présents dans la base de données.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public List<Etat> findAll() throws SQLException {
         List<Etat> etatList = new ArrayList<>();
         String sql = "SELECT * FROM etat";

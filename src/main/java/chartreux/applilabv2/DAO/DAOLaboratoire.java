@@ -15,6 +15,12 @@ public class DAOLaboratoire {
         this.cnx=cnx;
     }
 
+    /**
+     * Recherche un laboratoire par son identifiant.
+     * @param id L'identifiant du laboratoire à rechercher.
+     * @return Le laboratoire correspondant à l'identifiant, ou null s'il n'existe pas.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public Laboratoire findId(String id) throws SQLException {
         Laboratoire laboratoire = null;
         String sql = "SELECT * FROM laboratoires WHERE id=?";
@@ -34,6 +40,12 @@ public class DAOLaboratoire {
 
         return laboratoire;
     }
+
+    /**
+     * Récupère tous les laboratoires présents dans la base de données.
+     * @return Une liste contenant tous les laboratoires.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public List<Laboratoire> findAll() throws SQLException {
         List<Laboratoire> laboratoires = new ArrayList<>();
         String sql = "SELECT * FROM laboratoires";

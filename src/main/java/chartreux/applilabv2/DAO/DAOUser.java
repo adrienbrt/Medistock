@@ -18,6 +18,12 @@ public class DAOUser {
         this.cnx=cnx;
     }
 
+    /**
+     * Recherche un utilisateur dans la base de données en fonction de son ID.
+     * @param id L'ID de l'utilisateur à rechercher.
+     * @return L'utilisateur correspondant à l'ID spécifié, ou null s'il n'est pas trouvé.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public User find(String id) throws SQLException {
         User user = null;
         String SQL = "SELECT * FROM utilisateurs WHERE id=?";
@@ -39,6 +45,13 @@ public class DAOUser {
         return user;
     }
 
+    /**
+     * Recherche un utilisateur dans la base de données en fonction de son login et mot de passe.
+     * @param login Le login de l'utilisateur.
+     * @param password Le mot de passe de l'utilisateur.
+     * @return L'utilisateur correspondant aux identifiants spécifiés, ou null s'il n'est pas trouvé.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public User findConnect(String login, String password) throws SQLException {
         User user = null;
         String SQL = "SELECT * FROM utilisateurs WHERE login=? AND password=?";
@@ -61,6 +74,11 @@ public class DAOUser {
         return user;
     }
 
+    /**
+     * Récupère tous les utilisateurs présents dans la base de données.
+     * @return Une liste contenant tous les utilisateurs.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public List<User> findAll() throws SQLException{
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM utilisateurs";
@@ -96,6 +114,11 @@ public class DAOUser {
         return users;
     }
 
+    /**
+     * Met à jour les informations d'un utilisateur dans la base de données.
+     * @param user L'utilisateur à mettre à jour.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public void updateUser(User user) throws SQLException {
         if(user.getIsAdmin()){
             String sql = "UPDATE utilisateurs SET login=?, password=?, nom=?, prenom=?, role_id=1 WHERE id=?;";
@@ -159,6 +182,12 @@ public class DAOUser {
     }
 
 
+    /**
+     * Récupère tous les utilisateurs appartenant à un laboratoire spécifique.
+     * @param laboratoire Le laboratoire spécifique.
+     * @return Une liste contenant tous les utilisateurs du laboratoire.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public List<User> findAllInOneLab(Laboratoire laboratoire) throws SQLException{
         List<User> lesUtilisateurs = new ArrayList<>();
         List<Pair<Laboratoire,Role>> leRole= new ArrayList<>();
@@ -187,6 +216,13 @@ public class DAOUser {
 
     }
 
+
+    /**
+     * Récupère la liste des associations laboratoire-rôle pour un utilisateur spécifique.
+     * @param userId L'identifiant de l'utilisateur.
+     * @return Une liste des associations laboratoire-rôle de l'utilisateur.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public List<Pair<Laboratoire, Role>> getLesLaboRole(String userId) throws SQLException {
         List<Pair<Laboratoire, Role>> lesLabRole = new ArrayList<>();
         String query = "SELECT labId, roleId FROM userInLab WHERE userId = ?";
@@ -202,6 +238,12 @@ public class DAOUser {
         return lesLabRole;
     }
 
+
+    /**
+     * Crée un nouvel utilisateur administrateur dans la base de données.
+     * @param user L'utilisateur administrateur à créer.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public void CreateSup(User user) throws SQLException{
         String idUser = (count()+1) +"user";
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 1);";
@@ -215,6 +257,11 @@ public class DAOUser {
         System.out.println("ajouter");
     }
 
+    /**
+     * Crée un nouvel utilisateur normal dans la base de données.
+     * @param user L'utilisateur normal à créer.
+     * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
+     */
     public void CreateNorm(User user) throws SQLException{
         String idUser = "user" + (count()+1);
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 0);";
@@ -238,6 +285,12 @@ public class DAOUser {
         }
     }
 
+    /**
+     * Retourne le role d'un utilisateur dans un laboratoire
+     * @param user l'utilisateur
+     * @param laboratoire le labo
+     * @throws SQLException
+     */
     public Role userGetRoleLab(User user, Laboratoire laboratoire) throws SQLException {
         Role role = null;
         String sql = "SELECT r.id, r.libelle FROM role r JOIN userInLab uil ON r.id = uil.roleId WHERE uil.userId = ? AND uil.labId = ? ;";
@@ -254,6 +307,11 @@ public class DAOUser {
         return role;
     }
 
+    /**
+     * Retourne le nombre d'utilisateur
+     * @return int
+     * @throws SQLException
+     */
     public int count() throws SQLException {
         int count = 0;
         String SQL = "SELECT COUNT(*) FROM utilisateurs";

@@ -1,9 +1,10 @@
 package chartreux.applilabv2.controllers;
 
+import chartreux.applilabv2.DAO.DAOCommande;
+import chartreux.applilabv2.DAO.DAOIngredient;
+import chartreux.applilabv2.DAO.DAOMedicament;
 import chartreux.applilabv2.DAO.DAOUser;
-import chartreux.applilabv2.Entity.Laboratoire;
-import chartreux.applilabv2.Entity.Role;
-import chartreux.applilabv2.Entity.User;
+import chartreux.applilabv2.Entity.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.util.*;
 
 import chartreux.applilabv2.HelloApplication;
 import chartreux.applilabv2.Util.Tool;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,6 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
@@ -42,34 +45,34 @@ public class controllerTableau implements Initializable {
     private Button buttonAddUser;
 
     @FXML
-    private TableColumn<?, ?> columnDate;
+    private TableColumn<Pair<Commande, Integer>, String> columnDate;
 
     @FXML
-    private TableColumn<?, ?> columnEtat;
+    private TableColumn<Pair<Commande, Integer>, String> columnEtat;
 
     @FXML
-    private TableColumn<?, ?> columnIng;
+    private TableColumn<Pair<Ingredient,Integer>, String> columnIng;
 
     @FXML
-    private TableColumn<?, ?> columnIngQtt;
+    private TableColumn<Pair<Ingredient,Integer>, String> columnIngQtt;
 
     @FXML
-    private TableColumn<?, ?> columnMedoc;
+    private TableColumn<Pair<Medicament,Integer>, String> columnMedoc;
 
     @FXML
-    private TableColumn<?, ?> columnNbIng;
+    private TableColumn<Pair<Commande, Integer>, String> columnNbIng;
 
     @FXML
-    private TableColumn<?, ?> columnQttMedoc;
+    private TableColumn<Pair<Medicament,Integer>, String> columnQttMedoc;
 
     @FXML
-    private TableView<?> tableIng;
+    private TableView<Pair<Ingredient,Integer>> tableIng;
 
     @FXML
-    private TableView<?> tableLivraison;
+    private TableView<Pair<Commande, Integer>> tableLivraison;
 
     @FXML
-    private TableView<?> tableMedoc;
+    private TableView<Pair<Medicament,Integer>> tableMedoc;
 
     private final Connection cnx;
     private final User user;
@@ -96,6 +99,23 @@ public class controllerTableau implements Initializable {
         labCombox.setItems(lesLabos);
         labCombox.setValue(lesLabos.get(0));
 
+        columnIng.setCellValueFactory(celldata -> new SimpleStringProperty(celldata.getValue().getKey().getNom()));
+        columnIngQtt.setCellValueFactory(new PropertyValueFactory<>("value"));
+
+        columnMedoc.setCellValueFactory(celldata -> new SimpleStringProperty(celldata.getValue().getKey().getNom()));
+        columnQttMedoc.setCellValueFactory(new PropertyValueFactory<>("value"));
+
+        columnDate.setCellValueFactory(celldata -> new SimpleStringProperty(celldata.getValue().getKey().getDate().toString()));
+        columnEtat.setCellValueFactory(celldata -> new SimpleStringProperty(celldata.getValue().getKey().getEtat().getLibelle()));
+        columnNbIng.setCellValueFactory(new PropertyValueFactory<>("value"));
+
+
+        try {
+            setUpTable();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         if(Objects.equals(labCombox.getValue().getValue().getId(), "role3")){
             buttonAddUser.setVisible(false);
         }
@@ -115,7 +135,11 @@ public class controllerTableau implements Initializable {
         labCombox.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                displayAddUser();
+                try {
+                    displayAddUser();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -177,6 +201,22 @@ public class controllerTableau implements Initializable {
     }
 
     /**
+     * configure les tables pour afficher les données relatives aux commandes, aux ingrédients et aux médicaments. Elle récupère les données à partir des DAO correspondants et les ajoute aux listes observables utilisées par les tables.
+     */
+    private void setUpTable() throws SQLException {
+
+        ObservableList<Pair<Commande, Integer>> observableListCmd = FXCollections.observableArrayList(new DAOCommande(cnx).findAllCommandeLabNbIngHome(labCombox.getValue().getKey()));
+        tableLivraison.setItems(observableListCmd);
+
+        ObservableList<Pair<Ingredient, Integer>> observableListe = FXCollections.observableArrayList(new DAOIngredient(cnx).findIngredientLabHome(labCombox.getValue().getKey()));
+        tableIng.setItems(observableListe);
+
+        ObservableList<Pair<Medicament, Integer>> observableList = FXCollections.observableArrayList(new DAOMedicament(cnx).findMedicamentLabHome(labCombox.getValue().getKey()));
+        tableMedoc.setItems(observableList);
+
+    }
+
+    /**
      * Ouverture de la page des medicaments
      */
     private void openMedicamentTable() throws IOException {
@@ -208,10 +248,18 @@ public class controllerTableau implements Initializable {
         stage.centerOnScreen();
     }
 
-    private void displayAddUser() {
+    /**
+     *Cette méthode affiche le bouton "Ajouter utilisateur" en fonction du rôle sélectionné dans la combobox des laboratoires. Si le rôle est "role3", le bouton est rendu invisible.
+     *Elle appelle également la méthode setUpTable() pour mettre à jour les données affichées dans les tables.
+     */
+    private void displayAddUser() throws SQLException {
         buttonAddUser.setVisible(!Objects.equals(labCombox.getValue().getValue().getId(), "role3"));
+        setUpTable();
     }
-    
+
+    /**
+     * ouvre la page des utilisateur
+     */
     private void doAddUser(){
         try{
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("ManageUser.fxml"));
