@@ -3,6 +3,7 @@ import chartreux.applilabv2.Entity.Laboratoire;
 import chartreux.applilabv2.Entity.Role;
 import chartreux.applilabv2.Entity.User;
 import javafx.util.Pair;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DAOUser {
     private Connection cnx;
@@ -54,25 +56,28 @@ public class DAOUser {
      */
     public User findConnect(String login, String password) throws SQLException {
         User user = null;
-        String SQL = "SELECT * FROM utilisateurs WHERE login=? AND password=?";
+        String SQL = "SELECT * FROM utilisateurs WHERE login=?";
         try (PreparedStatement ps = cnx.prepareStatement(SQL)) {
             ps.setString(1, login);
-            ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    user = new User(
-                            rs.getString("id"),
-                            rs.getString("login"),
-                            rs.getString("password"),
-                            rs.getString("nom"),
-                            rs.getString("prenom"),
-                            rs.getBoolean("role_id")
-                    );
+                    String hashedPassword = rs.getString("password");
+                    if (BCrypt.checkpw(password, hashedPassword)) {
+                        user = new User(
+                                rs.getString("id"),
+                                rs.getString("login"),
+                                hashedPassword,
+                                rs.getString("nom"),
+                                rs.getString("prenom"),
+                                rs.getBoolean("role_id")
+                        );
+                    }
                 }
             }
         }
         return user;
     }
+
 
     /**
      * Récupère tous les utilisateurs présents dans la base de données.
@@ -120,24 +125,46 @@ public class DAOUser {
      * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
      */
     public void updateUser(User user) throws SQLException {
-        if(user.getIsAdmin()){
-            String sql = "UPDATE utilisateurs SET login=?, password=?, nom=?, prenom=?, role_id=1 WHERE id=?;";
-            PreparedStatement ps = cnx.prepareStatement(sql);
-            ps.setString(1, user.getLogin());
-            ps.setString(2, user.getPassword());
-            ps.setString(3, user.getNom());
-            ps.setString(4, user.getPrenom());
-            ps.setString(5, user.getId());
+        if (user.getIsAdmin()) {
+            String sql = "UPDATE utilisateurs SET login=?, nom=?, prenom=?, role_id=1";
+            if(!Objects.equals(user.getPassword(), "")){
+                sql+= ", password=? WHERE id=?;";
+                PreparedStatement ps = cnx.prepareStatement(sql);
+                ps.setString(1, user.getLogin());
 
-            ps.executeUpdate();
-            sql = "DELETE FROM userInLab WHERE userId=? ;";
-            ps = cnx.prepareStatement(sql);
-            ps.clearParameters();
-            ps.setString(1, user.getId());
-            ps.executeUpdate();
+                ps.setString(2, user.getNom());
+                ps.setString(3, user.getPrenom());
 
-        }else{
+                // Hashage du mot de passe
+                String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                ps.setString(4, hashedPassword);
+                ps.setString(5, user.getId());
 
+                ps.executeUpdate();
+                sql = "DELETE FROM userInLab WHERE userId=? ;";
+                ps = cnx.prepareStatement(sql);
+                ps.clearParameters();
+                ps.setString(1, user.getId());
+                ps.executeUpdate();
+            }else{
+                sql+="WHERE id=?;";
+                PreparedStatement ps = cnx.prepareStatement(sql);
+                ps.setString(1, user.getLogin());
+
+                ps.setString(2, user.getNom());
+                ps.setString(3, user.getPrenom());
+
+                ps.setString(4, user.getId());
+
+                ps.executeUpdate();
+                sql = "DELETE FROM userInLab WHERE userId=? ;";
+                ps = cnx.prepareStatement(sql);
+                ps.clearParameters();
+                ps.setString(1, user.getId());
+                ps.executeUpdate();
+            }
+
+        } else {
             List<String> currentLabIds = new ArrayList<>();
             String selectCurrentLabIdsSQL = "SELECT labId FROM userInLab WHERE userId = ?";
             PreparedStatement selectCurrentLabIdsPS = cnx.prepareStatement(selectCurrentLabIdsSQL);
@@ -147,17 +174,39 @@ public class DAOUser {
                 currentLabIds.add(currentLabIdsRS.getString("labId"));
             }
 
-            String sql = "UPDATE utilisateurs SET login=?, password=?, nom=?, prenom=?, role_id=0 WHERE id=?;";
-            PreparedStatement ps = cnx.prepareStatement(sql);
-            ps.setString(1, user.getLogin());
-            ps.setString(2, user.getPassword());
-            ps.setString(3, user.getNom());
-            ps.setString(4, user.getPrenom());
-            ps.setString(5, user.getId());
+            String sql = "UPDATE utilisateurs SET login=?, nom=?, prenom=?, role_id=0";
+            if(!Objects.equals(user.getPassword(), "")){
+                sql+= ", password=? WHERE id=?;";
+                PreparedStatement ps = cnx.prepareStatement(sql);
+                ps.setString(1, user.getLogin());
 
-            ps.executeUpdate();
+                ps.setString(2, user.getNom());
+                ps.setString(3, user.getPrenom());
 
-            for(Pair<Laboratoire,Role> pair: user.getlesLaboUtil()){
+                // Hashage du mot de passe
+                String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+                ps.setString(4, hashedPassword);
+                ps.setString(5, user.getId());
+
+                ps.executeUpdate();
+            }else{
+                sql+="WHERE id=?;";
+                PreparedStatement ps = cnx.prepareStatement(sql);
+                ps.setString(1, user.getLogin());
+
+                ps.setString(2, user.getNom());
+                ps.setString(3, user.getPrenom());
+
+                ps.setString(4, user.getId());
+
+                ps.executeUpdate();
+
+            }
+
+
+            PreparedStatement ps = cnx.prepareStatement(selectCurrentLabIdsSQL);
+
+            for (Pair<Laboratoire, Role> pair : user.getlesLaboUtil()) {
                 currentLabIds.remove(pair.getKey().getId());
 
                 sql = "UPDATE userInLab SET roleId=? WHERE userId=? AND labId=?;";
@@ -244,17 +293,20 @@ public class DAOUser {
      * @param user L'utilisateur administrateur à créer.
      * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
      */
-    public void CreateSup(User user) throws SQLException{
-        String idUser = (count()+1) +"user";
+    public void CreateSup(User user) throws SQLException {
+        String idUser = (count() + 1) + "user";
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 1);";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1, idUser);
         ps.setString(2, user.getLogin());
-        ps.setString(3,user.getPassword());
-        ps.setString(4,user.getNom());
+
+        // Hashage du mot de passe
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        ps.setString(3, hashedPassword);
+
+        ps.setString(4, user.getNom());
         ps.setString(5, user.getPrenom());
         ps.executeUpdate();
-        System.out.println("ajouter");
     }
 
     /**
@@ -262,20 +314,24 @@ public class DAOUser {
      * @param user L'utilisateur normal à créer.
      * @throws SQLException En cas d'erreur lors de l'exécution de la requête SQL.
      */
-    public void CreateNorm(User user) throws SQLException{
-        String idUser = "user" + (count()+1);
+    public void CreateNorm(User user) throws SQLException {
+        String idUser = "user" + (count() + 1);
         String sql = "INSERT INTO utilisateurs(id, login, password, nom, prenom, role_id) VALUES(?, ?, ?, ?, ?, 0);";
         PreparedStatement ps = cnx.prepareStatement(sql);
         ps.setString(1, idUser);
         ps.setString(2, user.getLogin());
-        ps.setString(3,user.getPassword());
-        ps.setString(4,user.getNom());
+
+        // Hashage du mot de passe
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        ps.setString(3, hashedPassword);
+
+        ps.setString(4, user.getNom());
         ps.setString(5, user.getPrenom());
         ps.executeUpdate();
 
         sql = "INSERT INTO userInLab (userId, labId, roleId) VALUES(?, ?, ?);";
         ps = cnx.prepareStatement(sql);
-        for (Pair<Laboratoire,Role> entry: user.getlesLaboUtil()) {
+        for (Pair<Laboratoire,Role> entry : user.getlesLaboUtil()) {
             Laboratoire laboratoire = entry.getKey();
             Role role = entry.getValue();
             ps.setString(1, idUser);

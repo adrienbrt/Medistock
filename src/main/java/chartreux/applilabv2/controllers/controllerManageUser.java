@@ -230,14 +230,14 @@ public class controllerManageUser implements Initializable {
             if(isAdmin){
                 User userUpdate = new User(id,
                         fieldLogin.getText(),
-                        tableView.getSelectionModel().getSelectedItem().getPassword(),
+                        fieldPassword.getText(),
                         fieldNom.getText(),fieldPrenom.getText(),
                         isAdmin);
                 daoUser.updateUser(userUpdate);
             }else{
                 User userUpdate = new User(id,
                         fieldLogin.getText(),
-                        tableView.getSelectionModel().getSelectedItem().getPassword(),
+                        fieldPassword.getText(),
                         fieldNom.getText(),fieldPrenom.getText(),
                         isAdmin,
                         listLabRole);
@@ -316,7 +316,7 @@ public class controllerManageUser implements Initializable {
             }else if(Objects.equals(newRole.getId(), "role1")){
                 listLabRole.clear();
                 isAdmin = true;
-                listLabRole.add(new Pair<>(null, newRole));
+                listLabRole.add(new Pair<>(new Laboratoire(), newRole));
             }else {
                 if(isAdmin){
                     listLabRole.clear();
@@ -377,6 +377,8 @@ public class controllerManageUser implements Initializable {
             alert.setContentText("Ajout de l'utilisateur " +user1.getLogin());
 
             alert.showAndWait();
+
+
         }else{
 
             user1.setLogin(fieldLogin.getText());
@@ -394,6 +396,10 @@ public class controllerManageUser implements Initializable {
 
             alert.showAndWait();
         }
+        fieldLogin.setText("");
+        fieldPrenom.setText("");
+        fieldNom.setText("");
+        fieldPassword.setText("");
 
         ObservableList<User> users = FXCollections.observableList(new DAOUser(cnx).findAll());
 

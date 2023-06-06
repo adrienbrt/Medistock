@@ -41,7 +41,6 @@ public class controllerLogin {
         if(!usernameLabel.getText().isBlank() && !passwordLabel.getText().isBlank()){
             loginMessageLabel.setText("tentative de connexion");
             User user = new DAOUser(cnx).findConnect(usernameLabel.getText(),passwordLabel.getText());
-//            User user = new DAOUser(cnx).findConnect("Superadmin","123+aze");
 
             if (user == null){
                 loginMessageLabel.setText("mauvais identifiants");
@@ -53,7 +52,7 @@ public class controllerLogin {
                 Parent root = fxmlLoader.load();
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) connexionButton.getScene().getWindow();
-                stage.setTitle("Accueil");
+                stage.setTitle("Gestion utilisateur");
                 stage.setScene(scene);
                 stage.centerOnScreen();
             }
@@ -65,6 +64,7 @@ public class controllerLogin {
                 Parent root = fxmlLoader.load();
                 Scene scene = new Scene(root);
                 Stage stage = (Stage) connexionButton.getScene().getWindow();
+                stage.setTitle("Accueil");
                 stage.setScene(scene);
                 stage.centerOnScreen();
             }

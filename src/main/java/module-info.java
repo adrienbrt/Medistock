@@ -5,6 +5,7 @@ module chartreux.applilabv2 {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires java.sql;
+    requires jbcrypt;
 
     opens chartreux.applilabv2 to javafx.fxml;
     opens chartreux.applilabv2.controllers to javafx.fxml;
