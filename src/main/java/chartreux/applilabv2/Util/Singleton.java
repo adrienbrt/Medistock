@@ -10,7 +10,7 @@ public class Singleton {
 
     private Singleton() throws SQLException {
 
-        dsn ="jdbc:mysql://127.0.0.1:3306/pharmav2";
+        dsn ="jdbc:mysql://10.30.103.78:3306/javadb";
         username = "pharmaapp";
         password = "123+aze";
         cnx = DriverManager.getConnection(dsn, username, password);
