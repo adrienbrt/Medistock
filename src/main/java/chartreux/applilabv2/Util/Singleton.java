@@ -9,6 +9,7 @@ public class Singleton {
     private static String password;
 
     private Singleton() throws SQLException {
+
         dsn ="jdbc:mysql://127.0.0.1:3306/pharmav2";
         username = "pharmaapp";
         password = "123+aze";

@@ -1,7 +1,6 @@
 package chartreux.applilabv2;
 
-import chartreux.applilabv2.DAO.DAOUser;
-import chartreux.applilabv2.Entity.User;
+
 import chartreux.applilabv2.Util.Singleton;
 import chartreux.applilabv2.controllers.controllerLogin;
 import javafx.application.Application;
@@ -13,7 +12,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
 
 public class HelloApplication extends Application {
     @Override
