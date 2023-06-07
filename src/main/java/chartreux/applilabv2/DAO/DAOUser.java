@@ -147,7 +147,7 @@ public class DAOUser {
                 ps.setString(1, user.getId());
                 ps.executeUpdate();
             }else{
-                sql+="WHERE id=?;";
+                sql+=" WHERE id=?;";
                 PreparedStatement ps = cnx.prepareStatement(sql);
                 ps.setString(1, user.getLogin());
 
@@ -190,7 +190,7 @@ public class DAOUser {
 
                 ps.executeUpdate();
             }else{
-                sql+="WHERE id=?;";
+                sql+=" WHERE id=?;";
                 PreparedStatement ps = cnx.prepareStatement(sql);
                 ps.setString(1, user.getLogin());
 
@@ -225,6 +225,29 @@ public class DAOUser {
                 deleteLabIdPS.setString(1, user.getId());
                 deleteLabIdPS.setString(2, labIdToRemove);
                 deleteLabIdPS.executeUpdate();
+            }
+
+            // Ajout de l'instruction INSERT pour les nouvelles valeurs de userInLab
+            for (Pair<Laboratoire, Role> pair : user.getlesLaboUtil()) {
+                // Vérifier si la paire Laboratoire et Role existe déjà dans userInLab
+                String checkExistsSQL = "SELECT COUNT(*) FROM userInLab WHERE userId = ? AND labId = ? AND roleId = ?";
+                PreparedStatement checkExistsPS = cnx.prepareStatement(checkExistsSQL);
+                checkExistsPS.setString(1, user.getId());
+                checkExistsPS.setString(2, pair.getKey().getId());
+                checkExistsPS.setString(3, pair.getValue().getId());
+                ResultSet existsResult = checkExistsPS.executeQuery();
+                existsResult.next();
+                int count = existsResult.getInt(1);
+
+                if (count == 0) {
+                    // La paire n'existe pas, exécuter l'instruction INSERT
+                    String insertSQL = "INSERT INTO userInLab (userId, labId, roleId) VALUES (?, ?, ?);";
+                    PreparedStatement insertPS = cnx.prepareStatement(insertSQL);
+                    insertPS.setString(1, user.getId());
+                    insertPS.setString(2, pair.getKey().getId());
+                    insertPS.setString(3, pair.getValue().getId());
+                    insertPS.executeUpdate();
+                }
             }
 
         }
